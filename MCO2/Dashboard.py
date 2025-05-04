@@ -7,8 +7,8 @@ import time
 import pandas as pd
 
 # Load datasets (replace with your actual file names)
-bfar_df = pd.read_csv('CPEN106_TAAL VOLCANO_Sulfur Dioxide Flux_2020-2025 - BFAR.csv')  # Placeholder filename
-philvolcs_df = pd.read_csv('CPEN106_TAAL VOLCANO_Sulfur Dioxide Flux_2020-2025 - PHIVOLCS PARAMETERS.csv')  # Placeholder filename
+bfar_df = pd.read_csv('BFAR.csv')  # Placeholder filename
+philvolcs_df = pd.read_csv('PHILVOLCS.csv')  # Placeholder filename
 
 # ==== CONFIGURATION (Developer Customizable) ====
 DEVELOPER_COLUMN_SPACING_PX = 25
