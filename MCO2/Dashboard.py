@@ -23,6 +23,12 @@ MODEL_EVAL_FOLDER = "MCO2/model_eval"
 
 AUTO_ADVANCE_INTERVAL = 3 # seconds for auto-advance
 
+st.set_page_config(
+    page_title="My Custom Dashboard",  # This changes the tab title
+    page_icon="📊",  # Optional: adds an icon to the tab
+    layout="wide"   # Optional: makes the layout wider
+)
+
 # ==== LOAD AND ENCODE HEADER IMAGE ====
 try:
     with open("MCO2/taal_lake.png", "rb") as img_file:
