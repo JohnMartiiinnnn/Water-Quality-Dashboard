@@ -365,7 +365,7 @@ with tab1:
         st.markdown("""
                 **BULASO, DAVE PATRICK I.**  
                 Phone: +63XXXXXXXXXX  
-                Email: example@example.com  
+                Email: main.davepatrick.bulaso@cvsu.edu.ph  
                 """)
 
         st.image("MCO2/alexa.jpg", width=100)
