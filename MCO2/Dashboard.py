@@ -277,7 +277,7 @@ with tab1:
             """, unsafe_allow_html=True)
 
     # Create two columns with ratio 2:3
-    col1, col3, col2 = st.columns([4, 0.5, 2])
+    col1, col3, col2 = st.columns([8, 0.1, 4])
 
     # Left Column - Information
     with col2:
