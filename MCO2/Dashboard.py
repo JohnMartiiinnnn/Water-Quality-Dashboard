@@ -588,7 +588,7 @@ with tab2:
         st.dataframe(bfar_df.head(20), height=300)
 
     with col2:
-        st.image("MCO2/PHILVOLCS.PNG", width=100)  # Make sure this image is in the same directory
+        st.image("MCO2/PHILVOLCS.png", width=100)  # Make sure this image is in the same directory
         st.subheader("PHIVOLCS Dataset (Volcanic Activity)")
         st.markdown(f"**Shape:** {philvolcs_df.shape[0]} rows × {philvolcs_df.shape[1]} columns")
         # Calculate missing values
