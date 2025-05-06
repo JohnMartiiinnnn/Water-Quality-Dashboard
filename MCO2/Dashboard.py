@@ -876,7 +876,7 @@ with tab4:
         """, unsafe_allow_html=True)
 
     # Display image right after text, tightly
-    show_image("prediction/actpred.png", "Actual vs Predicted pH (All Models)", width_percent=80)
+    show_image("MCO2/prediction/actpred.png", "Actual vs Predicted pH (All Models)", width_percent=80)
 
     # --------------- SECTION 4: Model Performance Comparison --------------- #
     st.markdown("<div class='section-header'> Model Performance (MAE & RMSE)</div>", unsafe_allow_html=True)
