@@ -24,7 +24,7 @@ MODEL_EVAL_FOLDER = "MCO2/model_eval"
 AUTO_ADVANCE_INTERVAL = 3 # seconds for auto-advance
 
 st.set_page_config(
-    page_title="My Custom Dashboard",  # This changes the tab title
+    page_title="Water Quality Dashboard",  # This changes the tab title
     page_icon="📊",  # Optional: adds an icon to the tab
     layout="wide"   # Optional: makes the layout wider
 )
