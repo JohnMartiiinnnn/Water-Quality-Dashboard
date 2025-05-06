@@ -453,7 +453,9 @@ with tab1:
             st.error("Error: Correlation image 'WQI.png' not found.")
         except Exception as e:
             st.error(f"Error displaying correlation heatmap: {e}")
-
+            
+        st.markdown("---") # Separator
+        
         # --- 2. Distribution Carousel ---
         def image_to_base64(image_path):
             with open(image_path, "rb") as img_file:
@@ -465,7 +467,9 @@ with tab1:
             else:
                 mime = "image/png"
             return f"data:{mime};base64,{b64_string}"
-
+            
+        st.markdown("---") # Separator
+        
         st.markdown("""
                     <h3 style='color: #112D4E; font-size: 20px; text-align: left; margin-top: 0px;'>
                     Distributions
@@ -507,6 +511,7 @@ with tab1:
             with col_next_dist:
                 st.button("Next", on_click=next_distribution_image, use_container_width=True,
                           disabled=(len(st.session_state.distribution_image_paths) <= 1), key="next_dist_btn")
+        
         st.markdown("---") # Separator
 
         # --- 3. Model Evaluation Carousel ---
@@ -514,7 +519,6 @@ with tab1:
             with open(image_path, "rb") as img_file:
                 b64_string = base64.b64encode(img_file.read()).decode()
             return f"data:image/png;base64,{b64_string}"
-
 
         st.markdown("""
                     <h3 style='color: #112D4E; font-size: 20px; text-align: left; margin-top: 0px;'>
@@ -555,6 +559,8 @@ with tab1:
             with open("MCO2/taal_lake.jpg", "rb") as image_file:
                 encoded = base64.b64encode(image_file.read()).decode()
 
+            st.markdown("---") # Separator
+            
             st.markdown(
                 f"""
                 <div style='text-align: center; margin-top: 10px; margin-bottom: 20px;'>
