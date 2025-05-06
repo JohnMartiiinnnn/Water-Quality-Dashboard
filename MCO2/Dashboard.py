@@ -468,7 +468,6 @@ with tab1:
                 mime = "image/png"
             return f"data:{mime};base64,{b64_string}"
             
-        st.markdown("---") # Separator
         
         st.markdown("""
                     <h3 style='color: #112D4E; font-size: 20px; text-align: left; margin-top: 0px;'>
