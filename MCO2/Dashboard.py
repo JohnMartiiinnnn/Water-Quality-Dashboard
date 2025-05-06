@@ -79,7 +79,7 @@ else:
 
 # --- Load Distribution Images ---
 distribution_image_files = []
-distributions_folder_exists = os.path.exists(MCO2/DISTRIBUTIONS_FOLDER)
+distributions_folder_exists = os.path.exists(DISTRIBUTIONS_FOLDER)
 distribution_image_paths = []
 if distributions_folder_exists:
     distribution_image_files = [f for f in os.listdir(DISTRIBUTIONS_FOLDER) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
@@ -88,7 +88,7 @@ if distributions_folder_exists:
 
 # --- Load Model Evaluation Images ---
 model_eval_image_files = []
-model_eval_folder_exists = os.path.exists(MCO2/MODEL_EVAL_FOLDER)
+model_eval_folder_exists = os.path.exists(MODEL_EVAL_FOLDER)
 model_eval_image_paths = []
 if model_eval_folder_exists:
     model_eval_image_files = [f for f in os.listdir(MODEL_EVAL_FOLDER) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
