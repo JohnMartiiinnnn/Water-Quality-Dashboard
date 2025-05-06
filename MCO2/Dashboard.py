@@ -358,7 +358,9 @@ with tab1:
         st.markdown("""
                 **BS CPE 3-1**
                 """)
-
+        st.markdown("""
+                **Group 2**
+                """)
         st.image("MCO2/dave.jpg", width=100)
         st.markdown("""
                 **BULASO, DAVE PATRICK I.**  
