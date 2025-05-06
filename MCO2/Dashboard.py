@@ -266,7 +266,14 @@ else:
 
 # ==== MAIN CONTENT ARE
 # Create the tabs
-tab1, tab2, tab3, tab4 = st.tabs(["🏠 Homepage", "📁 Dataset Information", "📈 Exploratory Data Analysis", "🔮 Prediction"])
+tab1, tab2, tab3, tab4, tab_recommendations = st.tabs([
+    "🏠 Homepage",
+    "📁 Dataset Information",
+    "📈 Exploratory Data Analysis",
+    "🔮 Prediction",
+    "📝 Recommendations"  # New Tab
+])
+
 
 # --- Tab 1: Homepage ---
 with tab1:
@@ -931,6 +938,50 @@ with tab4:
         </div>
         """, unsafe_allow_html=True)
 
+# --- Tab 5: Recommendations (NEW TAB) ---
+with tab_recommendations:
+    st.header("Recommendations for Future Work") # Styled by CSS: .stTabs [data-baseweb="tab-panel"] h2
+    st.markdown("""
+    <div style='margin-bottom: 20px; margin-top: 0px; font-size: 16px; text-align: justify; color: #333333;'>
+    Based on the current study, the following recommendations are proposed to create a more comprehensive system for predicting water quality in Taal Lake:
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.subheader("1. Enhance WQI Computation") # Styled by CSS: .stTabs [data-baseweb="tab-panel"] h3
+    st.markdown("""
+    * **Integrate More Parameters:** Incorporate predicted values for dissolved oxygen, ammonia, and nitrate into the Water Quality Index (WQI) calculation to better evaluate diverse water quality conditions.
+    * **Validate Classification Boundaries:** Compare the computed WQI with field measurements to establish and refine accurate classification thresholds.
+    """)
+
+    st.subheader("2. Expand and Diversify the Dataset")
+    st.markdown("""
+    * **Extend Data Collection:** Continue data collection beyond 2025 and increase the number of sampling points to improve coverage and potentially detect rapid events like volcanic impacts sooner.
+    * **Incorporate Geospatial Data:** Include coordinates for sampling sites to enable mapping visualizations and spatial modeling.
+    """)
+
+    st.subheader("3. Refine and Compare Models")
+    st.markdown("""
+    * **Optimize Hyperparameters:** Employ methods like grid search and Bayesian optimization to fine-tune model hyperparameters, aiming for further reduction in prediction errors.
+    """)
+
+    st.subheader("4. Improve Dashboard and Deployment")
+    st.markdown("""
+    * **Enable Real-Time Monitoring:** Integrate real-time data feeds from agencies such as PHIVOLCS and BFAR to transition the dashboard into a live monitoring system.
+    * **Add Interactive Maps:** Enhance the user experience by allowing interaction with geospatial displays or maps showing water quality data.
+    """)
+
+    st.subheader("5. Strengthen Stakeholder Engagement and Field Validation")
+    st.markdown("""
+    * **Collaborate for Field Validation:** Work closely with environmental agencies to obtain field-tested data, crucial for validating the model's real-world performance.
+    * **Gather User Feedback:** Actively seek input from resource managers and local community members to define essential dashboard features and effective ways to visualize and report data.
+    """)
+
+    st.markdown("---")
+    st.markdown("""
+    <div style='font-size: 18px; text-align: center; color: #555555; margin-top: 20px;'>
+    <i>These recommendations aim to build upon the current system, fostering a more robust, accurate, and user-centric tool for Taal Lake's environmental management.</i>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # Footer Section
