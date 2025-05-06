@@ -14,18 +14,18 @@ philvolcs_df = pd.read_csv('MCO2/PHILVOLCS.csv')  # Placeholder filename
 DEVELOPER_COLUMN_SPACING_PX = 25
 
 # Placeholder image filenames (ENSURE THESE FILES ARE IN THE SAME DIRECTORY)
-TREND_IMAGE_FILENAME = "trend_visualization.png"
-CORRELATION_IMAGE_FILENAME = "correlation_heatmap.png"
+TREND_IMAGE_FILENAME = "MCO2/trend_visualization.png"
+CORRELATION_IMAGE_FILENAME = "MCO2/correlation_heatmap.png"
 
 # --- Folder names for Carousels ---
-DISTRIBUTIONS_FOLDER = "distributions"
-MODEL_EVAL_FOLDER = "model_eval"
+DISTRIBUTIONS_FOLDER = "MCO2/distributions"
+MODEL_EVAL_FOLDER = "MCO2/model_eval"
 
 AUTO_ADVANCE_INTERVAL = 3 # seconds for auto-advance
 
 # ==== LOAD AND ENCODE HEADER IMAGE ====
 try:
-    with open("taal_lake.png", "rb") as img_file:
+    with open("MCO2/taal_lake.png", "rb") as img_file:
         banner_img_base64 = base64.b64encode(img_file.read()).decode()
 except FileNotFoundError:
     st.error("Error: 'taal_lake.png' not found. Please ensure the image file is present.")
@@ -34,7 +34,7 @@ except FileNotFoundError:
 # ==== LOAD AND ENCODE FONT ====
 try:
     # Make sure 'Montserrat-Bold.ttf' is in the same directory
-    with open("Montserrat-Bold.ttf", "rb") as f:
+    with open("MCO2/Montserrat-Bold.ttf", "rb") as f:
         font_base64 = base64.b64encode(f.read()).decode()
 except FileNotFoundError:
     st.warning("Warning: 'Montserrat-Bold.ttf' font not found. Using default sans-serif font.")
@@ -79,7 +79,7 @@ else:
 
 # --- Load Distribution Images ---
 distribution_image_files = []
-distributions_folder_exists = os.path.exists(DISTRIBUTIONS_FOLDER)
+distributions_folder_exists = os.path.exists(MCO2/DISTRIBUTIONS_FOLDER)
 distribution_image_paths = []
 if distributions_folder_exists:
     distribution_image_files = [f for f in os.listdir(DISTRIBUTIONS_FOLDER) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
@@ -88,7 +88,7 @@ if distributions_folder_exists:
 
 # --- Load Model Evaluation Images ---
 model_eval_image_files = []
-model_eval_folder_exists = os.path.exists(MODEL_EVAL_FOLDER)
+model_eval_folder_exists = os.path.exists(MCO2/MODEL_EVAL_FOLDER)
 model_eval_image_paths = []
 if model_eval_folder_exists:
     model_eval_image_files = [f for f in os.listdir(MODEL_EVAL_FOLDER) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
@@ -282,7 +282,7 @@ with tab1:
         </h2>
         """, unsafe_allow_html=True)
 
-        st.image("Taal-volcano-map.jpg", caption="Image from: ShelterBox USA")
+        st.image("MCO2/Taal-volcano-map.jpg", caption="Image from: ShelterBox USA")
         st.markdown("""
         <div style='text-align: justify;'>
         Taal Lake, located in Batangas, Philippines, is a freshwater volcanic lake 
@@ -346,28 +346,28 @@ with tab1:
                 **BS CPE 3-1**
                 """)
 
-        st.image("dave.jpg", width=100)
+        st.image("MCO2/dave.jpg", width=100)
         st.markdown("""
                 **BULASO, DAVE PATRICK I.**  
                 Phone: +63XXXXXXXXXX  
                 Email: example@example.com  
                 """)
 
-        st.image("alexa.jpg", width=100)
+        st.image("MCO2/alexa.jpg", width=100)
         st.markdown("""
                 **DENNA, ALEXA YVONNE V.**  
                 Phone: +639184719122    
                 Email: main.alexayvonne.denna@cvsu.edu.ph
                 """)
 
-        st.image("martin.png", width=100)
+        st.image("MCO2/martin.png", width=100)
         st.markdown("""
                 **EJERCITADO, JOHN MARTIN P.**  
                 Phone: +639262333664             
                 Email: main.johnmartin.ejercitado@cvsu.edu.ph 
                 """)
 
-        st.image("gian.jpg", width=100)
+        st.image("MCO2/gian.jpg", width=100)
         st.markdown("""
                 **ESPINO, GIAN JERICHO Z.**  
                 Phone: +639108733830    
@@ -375,7 +375,7 @@ with tab1:
 
                 """)
 
-        st.image("harley.jpg", width=100)
+        st.image("MCO2/harley.jpg", width=100)
         st.markdown("""
                 **INCIONG, HARLEY EVANGEL J.**  
                 Phone: +639516120316    
@@ -395,7 +395,7 @@ with tab1:
 
         # Load and encode the image
         try:
-            with open("corr.png", "rb") as image_file:
+            with open("MCO2/corr.png", "rb") as image_file:
                 encoded = base64.b64encode(image_file.read()).decode()
 
             st.markdown(
@@ -421,7 +421,7 @@ with tab1:
                     </h>
                     """, unsafe_allow_html=True)
         try:
-            with open("WQI.png", "rb") as image_file:
+            with open("MCO2/WQI.png", "rb") as image_file:
                 encoded = base64.b64encode(image_file.read()).decode()
 
             st.markdown(
@@ -537,7 +537,7 @@ with tab1:
                  st.button("Next", on_click=next_model_eval_image, use_container_width=True, disabled=(len(st.session_state.model_eval_image_paths) <= 1), key="next_eval_btn")
 
         try:
-            with open("taal_lake.jpg", "rb") as image_file:
+            with open("MCO2/taal_lake.jpg", "rb") as image_file:
                 encoded = base64.b64encode(image_file.read()).decode()
 
             st.markdown(
@@ -573,7 +573,7 @@ with tab2:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.image("BFAR.png", width=100)  # Make sure this image is in the same directory
+        st.image("MCO2/BFAR.png", width=100)  # Make sure this image is in the same directory
         st.subheader("BFAR Dataset (Water Quality)")
         st.markdown(f"**Shape:** {bfar_df.shape[0]} rows × {bfar_df.shape[1]} columns")
         bfar_missing = bfar_df.isnull().sum()
@@ -588,7 +588,7 @@ with tab2:
         st.dataframe(bfar_df.head(20), height=300)
 
     with col2:
-        st.image("PHILVOLCS.PNG", width=100)  # Make sure this image is in the same directory
+        st.image("MCO2/PHILVOLCS.PNG", width=100)  # Make sure this image is in the same directory
         st.subheader("PHIVOLCS Dataset (Volcanic Activity)")
         st.markdown(f"**Shape:** {philvolcs_df.shape[0]} rows × {philvolcs_df.shape[1]} columns")
         # Calculate missing values
@@ -634,7 +634,7 @@ with tab3:
                 data = f.read()
             return base64.b64encode(data).decode()
         try:
-            img_path = "eda/dpm.png"
+            img_path = "MCO2/eda/dpm.png"
             img_base64 = get_base64_of_bin_file(img_path)
 
             st.markdown(f"""
@@ -667,7 +667,7 @@ with tab3:
                 data = f.read()
             return base64.b64encode(data).decode()
         try:
-            img_path = "eda/seis.png"
+            img_path = "MCO2/eda/seis.png"
             img_base64 = get_base64_of_bin_file(img_path)
 
             st.markdown(f"""
@@ -710,7 +710,7 @@ with tab3:
 
                 # Display the static correlation image
                 try:
-                    st.image("corr.png")
+                    st.image("MCO2/corr.png")
                 except FileNotFoundError:
                     st.error(f"Error: Correlation image 'corr.png' not found.")
                 except Exception as e:
@@ -735,7 +735,7 @@ with tab3:
         st.markdown("<div class='section-header'> Weather Distribution</div>", unsafe_allow_html=True)
         # Display the static correlation image
         try:
-            st.image("eda/wd.png")
+            st.image("MCO2/eda/wd.png")
         except FileNotFoundError:
             st.error(f"Error: Correlation image '{CORRELATION_IMAGE_FILENAME}' not found.")
         except Exception as e:
@@ -763,7 +763,7 @@ with tab3:
 
     with col1:
         try:
-            st.image("eda/pardis.png", use_container_width=True)
+            st.image("MCO2/eda/pardis.png", use_container_width=True)
         except FileNotFoundError:
             st.error("Error: Correlation image 'eda/pardis.png' not found.")
         except Exception as e:
@@ -786,7 +786,7 @@ with tab3:
 
     with col1:
         try:
-            st.image("eda/box.png", use_container_width=True)
+            st.image("MCO2/eda/box.png", use_container_width=True)
         except FileNotFoundError:
             st.error("Error: Correlation image 'eda/pardis.png' not found.")
         except Exception as e:
@@ -815,8 +815,6 @@ with tab4:
     In this section, we showcase the models used to predict <b>pH levels</b> in Taal Lake, based on environmental and volcanic activity data. Here, you can compare the performance of different machine learning models — including <b>LSTM</b>, <b>CNN</b>, and a <b>Hybrid CNN-LSTM</b> model. The evaluation results, accuracy scores, and prediction charts will help you see which model offers the best performance for monitoring and forecasting water quality. This comparison provides valuable insights for selecting the most effective approach for future predictions.
     </div>
     """, unsafe_allow_html=True)
-import streamlit as st
-import base64
 
 def show_image(filepath, caption, width_percent=80):
     try:
@@ -845,7 +843,7 @@ with tab4:
             It helps visualize how quickly and effectively each model learned over epochs and whether overfitting or underfitting occurred.
         </div>
         """, unsafe_allow_html=True)
-    show_image("prediction/loss.png", "CNN Model Loss", width_percent=80)
+    show_image("MCO2/prediction/loss.png", "CNN Model Loss", width_percent=80)
 
     # --------------- SECTION 2: Actual vs Predicted (All Models) --------------- #
     st.markdown("<div class='section-header'> Actual vs Predicted Model Comparison</div>", unsafe_allow_html=True)
@@ -853,7 +851,7 @@ with tab4:
     col1, col2 = st.columns([4, 4])
 
     with col1:
-        show_image("prediction/actpred1.png", "Actual vs Predicted pH (All Models)", width_percent=90)
+        show_image("MCO2/prediction/actpred1.png", "Actual vs Predicted pH (All Models)", width_percent=90)
 
     with col2:
         st.markdown("""
@@ -886,7 +884,7 @@ with tab4:
     col1, space, col2 = st.columns([12, 0.01, 10])
 
     with col1:
-        show_image("prediction/metric.png", "Model Performance: MAE & RMSE", width_percent=90)
+        show_image("MCO2/prediction/metric.png", "Model Performance: MAE & RMSE", width_percent=90)
 
     with col2:
         st.markdown("""
@@ -909,7 +907,7 @@ with tab4:
 
     with col2:
         st.markdown("<div style='margin-top: 50px;'>", unsafe_allow_html=True)
-        show_image("WQI.png", "Water Quality Index Distribution", width_percent=90)
+        show_image("MCO2/WQI.png", "Water Quality Index Distribution", width_percent=90)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col1:
