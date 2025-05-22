@@ -2,7 +2,6 @@ import streamlit as st
 import base64
 import datetime
 import os
-from PIL import Image
 import time
 import pandas as pd
 
@@ -12,10 +11,6 @@ philvolcs_df = pd.read_csv('MCO2/PHILVOLCS.csv')  # Placeholder filename
 
 # ==== CONFIGURATION (Developer Customizable) ====
 DEVELOPER_COLUMN_SPACING_PX = 25
-
-# Placeholder image filenames (ENSURE THESE FILES ARE IN THE SAME DIRECTORY)
-TREND_IMAGE_FILENAME = "MCO2/trend_visualization.png"
-CORRELATION_IMAGE_FILENAME = "MCO2/correlation_heatmap.png"
 
 # --- Folder names for Carousels ---
 DISTRIBUTIONS_FOLDER = "MCO2/distributions"
@@ -39,7 +34,6 @@ except FileNotFoundError:
 
 # ==== LOAD AND ENCODE FONT ====
 try:
-    # Make sure 'Montserrat-Bold.ttf' is in the same directory
     with open("MCO2/Montserrat-Bold.ttf", "rb") as f:
         font_base64 = base64.b64encode(f.read()).decode()
 except FileNotFoundError:
@@ -57,30 +51,25 @@ if font_base64:
     /* Apply font globally if loaded */
     .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
     .section-header, .custom-label,
-    .stTabs [data-baseweb="tab"] {{ /* Target tab headers */
+    .stTabs [data-baseweb="tab"], /* Target tab headers */
+    .stTabs [data-baseweb="tab"] p, /* Target text within tab headers */
+    .stButton button,
+    .streamlit-expanderHeader p, .streamlit-expanderContent div {{
         font-family: 'Montserrat', sans-serif !important;
-    }}
-    .stTabs [data-baseweb="tab"] p {{ /* Target text within tab headers */
-         font-family: 'Montserrat', sans-serif !important;
-    }}
-    /* Add other elements you want to apply Montserrat to */
-    .stButton button, .stFileUploader label, .stMultiSelect label,
-    .streamlit-expanderHeader p, .streamlit-expanderContent div {{ /* Keep if you add other components later */
-         font-family: 'Montserrat', sans-serif !important;
     }}
     """
 else:
-    # Fallback font style if Montserrat is not found
     font_style = """
-    .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, stApp h6,
+    .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
     .section-header, .custom-label,
-     .stTabs [data-baseweb="tab"], /* Target tab headers */
-     .stTabs [data-baseweb="tab"] p, /* Target text within tab headers */
-     .stButton button, .stFileUploader label, .stMultiSelect label,
-     .streamlit-expanderHeader p, .streamlit-expanderContent div {{ /* Keep if you add other components later */
+    .stTabs [data-baseweb="tab"], /* Target tab headers */
+    .stTabs [data-baseweb="tab"] p, /* Target text within tab headers */
+    .stButton button,
+    .streamlit-expanderHeader p, .streamlit-expanderContent div {{
         font-family: sans-serif; /* Fallback font */
     }}
     """
+
 # ==== IMAGE LOADING AND SESSION STATE FOR CAROUSELS ====
 
 # --- Load Distribution Images ---
@@ -101,7 +90,6 @@ if model_eval_folder_exists:
     model_eval_image_files.sort()
     model_eval_image_paths = [os.path.join(MODEL_EVAL_FOLDER, f) for f in model_eval_image_files]
 
-
 # --- Initialize Session State ---
 if 'distribution_image_paths' not in st.session_state:
     st.session_state.distribution_image_paths = distribution_image_paths
@@ -112,7 +100,6 @@ if 'model_eval_image_paths' not in st.session_state:
     st.session_state.model_eval_image_paths = model_eval_image_paths
     st.session_state.current_model_eval_index = 0
     st.session_state.last_auto_advance_model_eval_time = time.time()
-
 
 # --- Auto-advance Logic (runs on every script rerun) ---
 current_time = time.time()
@@ -129,7 +116,6 @@ if st.session_state.model_eval_image_paths:
         st.session_state.current_model_eval_index = (st.session_state.current_model_eval_index + 1) % len(st.session_state.model_eval_image_paths)
         st.session_state.last_auto_advance_model_eval_time = current_time
 
-
 # --- Manual Navigation Handlers ---
 def next_distribution_image():
     if st.session_state.distribution_image_paths:
@@ -138,7 +124,6 @@ def next_distribution_image():
 
 def prev_distribution_image():
     if st.session_state.distribution_image_paths:
-        # Use current_distribution_index for correct wrapping
         st.session_state.current_distribution_index = (st.session_state.current_distribution_index - 1) % len(st.session_state.distribution_image_paths)
         st.session_state.last_auto_advance_distribution_time = time.time()
 
@@ -149,17 +134,14 @@ def next_model_eval_image():
 
 def prev_model_eval_image():
     if st.session_state.model_eval_image_paths:
-        # Use current_model_eval_index for correct wrapping
         st.session_state.current_model_eval_index = (st.session_state.current_model_eval_index - 1) % len(st.session_state.model_eval_image_paths)
         st.session_state.last_auto_advance_model_eval_time = time.time()
-
 
 # Inject CSS styles into the Streamlit app
 st.markdown(f"""
 <style>
     {font_style} /* Inject font style (Montserrat or fallback) */
 
-    
     /* Main content container styling */
     .block-container {{
         padding: 0rem 3rem !important; /* Adjust left/right padding */
@@ -193,7 +175,6 @@ st.markdown(f"""
     }}
 
     /* === Column Wrapper for Developer-Set Spacing === */
-    /* Applies right padding to all direct children (columns) except the last one */
     .column-wrapper > div {{
         padding-right: {DEVELOPER_COLUMN_SPACING_PX}px !important; /* Use developer-set spacing */
     }}
@@ -202,8 +183,6 @@ st.markdown(f"""
     }}
 
     /* === Tabs Styling === */
-    
-        /* Style for headers within the tab content area */
     .stTabs [data-baseweb="tab-panel"] h2 {{
         color: #003366; 
         font-size: 24px; 
@@ -243,15 +222,13 @@ st.markdown(f"""
 
     .stTabs [aria-selected="true"] {{
         background-color: #123458; 
-        color: #ffffff !important; /* White text when selected
+        color: #ffffff !important; /* White text when selected */
         height: 40px;
     }}
-
 </style>
-""", unsafe_allow_html=True) # Render the CSS
+""", unsafe_allow_html=True)
 
 # ==== DISPLAY BANNER IMAGE ====
-# Display the banner image if it was loaded successfully
 if banner_img_base64:
     st.markdown(f"""
     <div class="banner-container" id="banner">
@@ -259,21 +236,18 @@ if banner_img_base64:
     </div>
     """, unsafe_allow_html=True)
 else:
-    # Fallback text if the image failed to load
     st.markdown(
         "<div class='banner-container' id='banner' style='min-height: 80px; background-color: #eee; display: flex; align-items: center; justify-content: center;'><p style='color: #555;'>Banner Image Area (Image not found)</p></div>",
         unsafe_allow_html=True)
 
-# ==== MAIN CONTENT ARE
-# Create the tabs
+# ==== MAIN CONTENT AREA ====
 tab1, tab2, tab3, tab4, tab_recommendations = st.tabs([
     "🏠 Homepage",
     "📁 Dataset Information",
     "📈 Exploratory Data Analysis",
     "🔮 Prediction",
-    "📝 Recommendations"  # New Tab
+    "📝 Recommendations"
 ])
-
 
 # --- Tab 1: Homepage ---
 with tab1:
@@ -283,12 +257,9 @@ with tab1:
             </h3>
             """, unsafe_allow_html=True)
 
-    # Create two columns with ratio 2:3
     col1, col3, col2 = st.columns([8, 0.1, 4])
 
-    # Left Column - Information
     with col2:
-        # About Taal
         st.markdown("""
         <h2 style='color: #25316D; font-size: 18px; text-align: left;'>
         About Taal Lake
@@ -309,7 +280,6 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
 
-        # About the Course and Activity
         st.markdown("""
                 <h3 style='color: #25316D; font-size: 18px; text-align: left; margin-top: 5px;'>
                 About the Course and Activity
@@ -349,10 +319,10 @@ with tab1:
         - Provide recommendations based on WQI and pollutant data.
         """, unsafe_allow_html=True)
 
-        # About the Developers header
         st.markdown("""
                 <h3 style='color: #25316D; font-size: 18px; text-align: left; margin-top: 5px;'>
                 About the Developers
+                </h3>
                 """, unsafe_allow_html=True)
 
         st.markdown("""
@@ -387,7 +357,6 @@ with tab1:
                 **ESPINO, GIAN JERICHO Z.**  
                 Phone: +639108733830    
                 Email: main.gianjericho.espino@cvsu.edu.ph
-
                 """)
 
         st.image("MCO2/harley.jpg", width=100)
@@ -397,18 +366,15 @@ with tab1:
                 Email: main.harleyevangel.inciong@cvsu.edu.ph
                 """)
 
-    # Right Column - Visualizations (placeholder for now)
     with col1:
-        st.header("Featured Visualizations") # Main header for this column
+        st.header("Featured Visualizations")
 
-        # --- 1. Static Correlation Heatmap Image ---
         st.markdown("""
             <h3 style='color: #112D4E; font-size: 20px; text-align: left; margin-top: 0px;'>
             Correlation Heatmap
             </h3>
             """, unsafe_allow_html=True)
 
-        # Load and encode the image
         try:
             with open("MCO2/corr.png", "rb") as image_file:
                 encoded = base64.b64encode(image_file.read()).decode()
@@ -428,12 +394,12 @@ with tab1:
         except Exception as e:
             st.error(f"Error displaying correlation heatmap: {e}")
 
-        st.markdown("---") # Separator
+        st.markdown("---")
 
         st.markdown("""
                     <h3 style='color: #112D4E; font-size: 20px; text-align: left; margin-top: 0px;'>
                     Water Quality Index
-                    </h>
+                    </h3>
                     """, unsafe_allow_html=True)
         try:
             with open("MCO2/WQI.png", "rb") as image_file:
@@ -450,25 +416,17 @@ with tab1:
             )
 
         except FileNotFoundError:
-            st.error("Error: Correlation image 'WQI.png' not found.")
+            st.error("Error: Image 'WQI.png' not found.")
         except Exception as e:
-            st.error(f"Error displaying correlation heatmap: {e}")
+            st.error(f"Error displaying image: {e}")
             
-        st.markdown("---") # Separator
-        
-        # --- 2. Distribution Carousel ---
+        st.markdown("---")
+
         def image_to_base64(image_path):
             with open(image_path, "rb") as img_file:
                 b64_string = base64.b64encode(img_file.read()).decode()
-            # Detect correct mime type based on extension
-            ext = os.path.splitext(image_path)[1].lower()
-            if ext in [".jpg", ".jpeg"]:
-                mime = "image/jpeg"
-            else:
-                mime = "image/png"
-            return f"data:{mime};base64,{b64_string}"
-            
-        
+            return f"data:image/png;base64,{b64_string}"
+
         st.markdown("""
                     <h3 style='color: #112D4E; font-size: 20px; text-align: left; margin-top: 0px;'>
                     Distributions
@@ -480,14 +438,11 @@ with tab1:
         elif not st.session_state.distribution_image_paths:
             st.warning(f"No image files (.png, .jpg, .jpeg) found in the '{DISTRIBUTIONS_FOLDER}' folder.")
         else:
-            # Display the current image from the carousel
             current_image_path = st.session_state.distribution_image_paths[st.session_state.current_distribution_index]
             image_caption = os.path.basename(current_image_path).replace("_", " ").rsplit('.', 1)[0]
 
-            # Convert image to base64
             img_base64 = image_to_base64(current_image_path)
 
-            # Styled image with padding and rounded corners
             st.markdown(
                 f"""
                 <div style='padding: 20px; text-align: center;'>
@@ -497,7 +452,6 @@ with tab1:
                 unsafe_allow_html=True
             )
 
-            # Navigation buttons for Distribution Carousel
             col_prev_dist, col_status_dist, col_next_dist = st.columns([1, 2, 1])
             with col_prev_dist:
                 st.button("Previous", on_click=prev_distribution_image, use_container_width=True,
@@ -511,13 +465,7 @@ with tab1:
                 st.button("Next", on_click=next_distribution_image, use_container_width=True,
                           disabled=(len(st.session_state.distribution_image_paths) <= 1), key="next_dist_btn")
         
-        st.markdown("---") # Separator
-
-        # --- 3. Model Evaluation Carousel ---
-        def image_to_base64(image_path):
-            with open(image_path, "rb") as img_file:
-                b64_string = base64.b64encode(img_file.read()).decode()
-            return f"data:image/png;base64,{b64_string}"
+        st.markdown("---")
 
         st.markdown("""
                     <h3 style='color: #112D4E; font-size: 20px; text-align: left; margin-top: 0px;'>
@@ -533,7 +481,6 @@ with tab1:
             current_image_path = st.session_state.model_eval_image_paths[st.session_state.current_model_eval_index]
             image_caption = os.path.basename(current_image_path).replace("_", " ").rsplit('.', 1)[0]
 
-            # Convert image to base64
             img_base64 = image_to_base64(current_image_path)
 
             st.markdown(
@@ -545,20 +492,19 @@ with tab1:
                 unsafe_allow_html=True
             )
 
-             # Navigation buttons for Model Evaluation Carousel
             col_prev_eval, col_status_eval, col_next_eval = st.columns([1, 2, 1])
             with col_prev_eval:
                 st.button("Previous", on_click=prev_model_eval_image, use_container_width=True, disabled=(len(st.session_state.model_eval_image_paths) <= 1), key="prev_eval_btn")
             with col_status_eval:
                 st.markdown(f"<p style='text-align:center; margin-top: 00px;'>Image {st.session_state.current_model_eval_index + 1} of {len(st.session_state.model_eval_image_paths)}</p>", unsafe_allow_html=True)
             with col_next_eval:
-                 st.button("Next", on_click=next_model_eval_image, use_container_width=True, disabled=(len(st.session_state.model_eval_image_paths) <= 1), key="next_eval_btn")
+                st.button("Next", on_click=next_model_eval_image, use_container_width=True, disabled=(len(st.session_state.model_eval_image_paths) <= 1), key="next_eval_btn")
 
         try:
             with open("MCO2/taal_lake.jpg", "rb") as image_file:
                 encoded = base64.b64encode(image_file.read()).decode()
 
-            st.markdown("---") # Separator
+            st.markdown("---")
             
             st.markdown(
                 f"""
@@ -571,9 +517,9 @@ with tab1:
             )
 
         except FileNotFoundError:
-            st.error("Error: Correlation image 'corr.png' not found.")
+            st.error("Error: Image 'taal_lake.jpg' not found.")
         except Exception as e:
-            st.error(f"Error displaying correlation heatmap: {e}")
+            st.error(f"Error displaying image: {e}")
 
 # --- Tab 2: Dataset Information ---
 with tab2:
@@ -589,11 +535,10 @@ with tab2:
     </div>
     """, unsafe_allow_html=True)
 
-    # Source Logos and Names
     col1, col2 = st.columns(2)
 
     with col1:
-        st.image("MCO2/BFAR.png", width=100)  # Make sure this image is in the same directory
+        st.image("MCO2/BFAR.png", width=100)
         st.subheader("BFAR Dataset (Water Quality)")
         st.markdown(f"**Shape:** {bfar_df.shape[0]} rows × {bfar_df.shape[1]} columns")
         bfar_missing = bfar_df.isnull().sum()
@@ -608,10 +553,9 @@ with tab2:
         st.dataframe(bfar_df.head(20), height=300)
 
     with col2:
-        st.image("MCO2/PHILVOLCS.png", width=100)  # Make sure this image is in the same directory
+        st.image("MCO2/PHILVOLCS.png", width=100)
         st.subheader("PHIVOLCS Dataset (Volcanic Activity)")
         st.markdown(f"**Shape:** {philvolcs_df.shape[0]} rows × {philvolcs_df.shape[1]} columns")
-        # Calculate missing values
         philvolcs_missing = philvolcs_df.isnull().sum()
         philvolcs_missing_top3 = philvolcs_missing.sort_values(ascending=False).head(3)
 
@@ -622,7 +566,7 @@ with tab2:
         st.markdown(f"**Total Missing Cells:** {philvolcs_missing.sum()} cells")
 
         st.markdown("**Preview:**")
-        st.dataframe(philvolcs_df.head(20), height = 300)
+        st.dataframe(philvolcs_df.head(20), height=300)
 
     st.markdown("""
         <div style='margin-bottom: 10px; margin-top: 10px; font-size: 16px; text-align: justify; color: #333333;'>
@@ -640,15 +584,12 @@ with tab3:
     </div>
     """, unsafe_allow_html=True)
 
-    # Apply the column wrapper DIV to control spacing between analysis columns for the images
     st.markdown('<div class="column-wrapper">', unsafe_allow_html=True)
-    col1, space, col2 = st.columns([2,0.1,2]) # Create two columns within the tab content area
+    col1, space, col2 = st.columns([2, 0.1, 2])
 
-    # --- Trend Visualization Column (Image) ---
     with col1:
         st.markdown("<div class='section-header'>Distribution of Data by Month</div>", unsafe_allow_html=True)
 
-        # Display the static trend image
         def get_base64_of_bin_file(bin_file):
             with open(bin_file, 'rb') as f:
                 data = f.read()
@@ -681,11 +622,6 @@ with tab3:
 
         st.markdown("<div class='section-header'>Seismicity Over Time</div>", unsafe_allow_html=True)
 
-        # Display the static seismicity imag
-        def get_base64_of_bin_file(bin_file):
-            with open(bin_file, 'rb') as f:
-                data = f.read()
-            return base64.b64encode(data).decode()
         try:
             img_path = "MCO2/eda/seis.png"
             img_base64 = get_base64_of_bin_file(img_path)
@@ -701,12 +637,6 @@ with tab3:
         except Exception as e:
             st.error(f"Error displaying seismicity image: {e}")
 
-        except FileNotFoundError:
-            st.error("Error: Seismicity image 'seis.png' not found.")
-        except Exception as e:
-            st.error(f"Error displaying seismicity image: {e}")
-
-        # Expandable analysis section
         with st.expander("View Description"):
             st.markdown("""
                 <div style='margin-top: 10px; font-size: 16px; text-align: justify; color: #333333;'>
@@ -721,45 +651,38 @@ with tab3:
                 </div>
                 """, unsafe_allow_html=True)
 
-
-    # --- Correlation Analysis Column (Image) ---
     with col2:
-        with col2:
-            with col2:
-                st.markdown("<div class='section-header'>Correlation Heatmap</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Correlation Heatmap</div>", unsafe_allow_html=True)
 
-                # Display the static correlation image
-                try:
-                    st.image("MCO2/corr.png")
-                except FileNotFoundError:
-                    st.error(f"Error: Correlation image 'corr.png' not found.")
-                except Exception as e:
-                    st.error(f"Error displaying correlation image: {e}")
+        try:
+            st.image("MCO2/corr.png")
+        except FileNotFoundError:
+            st.error(f"Error: Correlation image 'corr.png' not found.")
+        except Exception as e:
+            st.error(f"Error displaying correlation image: {e}")
 
-                # Expandable analysis section
-                with st.expander("View Description"):
-                    st.markdown("""
-                    <div style='margin-top: 10px; font-size: 16px; text-align: justify; color: #333333;'>
-                    <b>Analysis:</b> This heatmap shows how different water quality factors in Taal Lake are connected:
-                    <ul>
-                        <li><b>pH and Phosphate</b> are closely linked — when phosphate levels go up, pH tends to rise too.</li>
-                        <li>Over time, as the <b>years pass</b> and the <b>temperature increases</b>, the <b>pH drops</b>, meaning the lake is becoming a little more acidic.</li>
-                        <li><b>Phosphate and Acidity</b> also go hand in hand, meaning higher nutrients can raise acidity levels.</li>
-                        <li>The <b>temperature</b> has been rising over the years, which matches warming trends seen in the data.</li>
-                        <li><b>Seismic activity</b> doesn’t show a strong direct connection with the water quality in this chart, which suggests the effects are more complex.</li>
-                    </ul>
-                    In short, this chart tells us that <b>temperature and nutrients</b> are big drivers of changes in <b>pH and acidity</b> — key signs of the lake’s health.
-                    </div>
-                    """, unsafe_allow_html=True)
+        with st.expander("View Description"):
+            st.markdown("""
+            <div style='margin-top: 10px; font-size: 16px; text-align: justify; color: #333333;'>
+            <b>Analysis:</b> This heatmap shows how different water quality factors in Taal Lake are connected:
+            <ul>
+                <li><b>pH and Phosphate</b> are closely linked — when phosphate levels go up, pH tends to rise too.</li>
+                <li>Over time, as the <b>years pass</b> and the <b>temperature increases</b>, the <b>pH drops</b>, meaning the lake is becoming a little more acidic.</li>
+                <li><b>Phosphate and Acidity</b> also go hand in hand, meaning higher nutrients can raise acidity levels.</li>
+                <li>The <b>temperature</b> has been rising over the years, which matches warming trends seen in the data.</li>
+                <li><b>Seismic activity</b> doesn’t show a strong direct connection with the water quality in this chart, which suggests the effects are more complex.</li>
+            </ul>
+            In short, this chart tells us that <b>temperature and nutrients</b> are big drivers of changes in <b>pH and acidity</b> — key signs of the lake’s health.
+            </div>
+            """, unsafe_allow_html=True)
 
         st.markdown("<div class='section-header'> Weather Distribution</div>", unsafe_allow_html=True)
-        # Display the static correlation image
         try:
             st.image("MCO2/eda/wd.png")
         except FileNotFoundError:
-            st.error(f"Error: Correlation image '{CORRELATION_IMAGE_FILENAME}' not found.")
+            st.error(f"Error: Image 'eda/wd.png' not found.")
         except Exception as e:
-            st.error(f"Error displaying correlation image: {e}")
+            st.error(f"Error displaying image: {e}")
 
         with st.expander("View Description"):
             st.markdown("""
@@ -774,20 +697,18 @@ with tab3:
             </div>
             """, unsafe_allow_html=True)
 
-    # Close the column wrapper DIV
 with tab3:
     st.markdown("<div class='section-header'> Parameter Distribution</div>", unsafe_allow_html=True)
 
-    # Create two columns with custom ratio (e.g., 3:2)
     col1, col2 = st.columns([5, 2])
 
     with col1:
         try:
             st.image("MCO2/eda/pardis.png", use_container_width=True)
         except FileNotFoundError:
-            st.error("Error: Correlation image 'eda/pardis.png' not found.")
+            st.error("Error: Image 'eda/pardis.png' not found.")
         except Exception as e:
-            st.error(f"Error displaying correlation image: {e}")
+            st.error(f"Error displaying image: {e}")
 
     with col2:
         with st.expander("View Description"):
@@ -801,16 +722,15 @@ with tab3:
 with tab3:
     st.markdown("<div class='section-header'> Boxplots</div>", unsafe_allow_html=True)
 
-    # Create two columns with custom ratio (e.g., 3:2)
     col1, col2 = st.columns([5, 2])
 
     with col1:
         try:
             st.image("MCO2/eda/box.png", use_container_width=True)
         except FileNotFoundError:
-            st.error("Error: Correlation image 'eda/pardis.png' not found.")
+            st.error("Error: Image 'eda/box.png' not found.")
         except Exception as e:
-            st.error(f"Error displaying correlation image: {e}")
+            st.error(f"Error displaying image: {e}")
 
     with col2:
         with st.expander("View Description"):
@@ -820,7 +740,6 @@ with tab3:
                 environmental patterns in Taal Lake. This cleaned dataset helps ensure the reliability 
                 of further modeling and predictions.
             """)
-
 
 # --- Tab 4: Prediction ---
 with tab4:
@@ -855,7 +774,6 @@ def show_image(filepath, caption, width_percent=80):
         st.error(f"Error displaying image: {e}")
 
 with tab4:
-    # --------------- SECTION 1: Model Loss --------------- #
     st.markdown("<div class='section-header'> Model Loss Comparison</div>", unsafe_allow_html=True)
     st.markdown("""
         <div style='text-align: justify; margin-top: 0px; width: 100%;'>
@@ -865,7 +783,6 @@ with tab4:
         """, unsafe_allow_html=True)
     show_image("MCO2/prediction/loss.png", "CNN Model Loss", width_percent=80)
 
-    # --------------- SECTION 2: Actual vs Predicted (All Models) --------------- #
     st.markdown("<div class='section-header'> Actual vs Predicted Model Comparison</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns([4, 4])
@@ -886,7 +803,6 @@ with tab4:
         </div>
         """, unsafe_allow_html=True)
 
-    # --------------- SECTION 3: Individual Model Predictions --------------- #
     st.markdown("<div class='section-header'> Individual Model Predictions</div>", unsafe_allow_html=True)
 
     st.markdown("""
@@ -895,10 +811,8 @@ with tab4:
         </div>
         """, unsafe_allow_html=True)
 
-    # Display image right after text, tightly
     show_image("MCO2/prediction/actpred.png", "Actual vs Predicted pH (All Models)", width_percent=80)
 
-    # --------------- SECTION 4: Model Performance Comparison --------------- #
     st.markdown("<div class='section-header'> Model Performance (MAE & RMSE)</div>", unsafe_allow_html=True)
 
     col1, space, col2 = st.columns([12, 0.01, 10])
@@ -921,7 +835,6 @@ with tab4:
         </div>
         """, unsafe_allow_html=True)
 
-    # --------------- SECTION 5: Water Quality Index --------------- #
     st.markdown("<div class='section-header'> Water Quality Index (WQI) Distribution</div>", unsafe_allow_html=True)
     col1, col2 = st.columns([5, 4])
 
@@ -945,16 +858,16 @@ with tab4:
         </div>
         """, unsafe_allow_html=True)
 
-# --- Tab 5: Recommendations (NEW TAB) ---
+# --- Tab 5: Recommendations ---
 with tab_recommendations:
-    st.header("Recommendations for Future Work") # Styled by CSS: .stTabs [data-baseweb="tab-panel"] h2
+    st.header("Recommendations for Future Work")
     st.markdown("""
     <div style='margin-bottom: 20px; margin-top: 0px; font-size: 16px; text-align: justify; color: #333333;'>
     Based on the current study, the following recommendations are proposed to create a more comprehensive system for predicting water quality in Taal Lake:
     </div>
     """, unsafe_allow_html=True)
 
-    st.subheader("1. Enhance WQI Computation") # Styled by CSS: .stTabs [data-baseweb="tab-panel"] h3
+    st.subheader("1. Enhance WQI Computation")
     st.markdown("""
     * **Integrate More Parameters:** Incorporate predicted values for dissolved oxygen, ammonia, and nitrate into the Water Quality Index (WQI) calculation to better evaluate diverse water quality conditions.
     * **Validate Classification Boundaries:** Compare the computed WQI with field measurements to establish and refine accurate classification thresholds.
@@ -990,12 +903,9 @@ with tab_recommendations:
     </div>
     """, unsafe_allow_html=True)
 
-
 # Footer Section
-st.markdown("---") # Final separator
-# --- Add Date/Time ---
+st.markdown("---")
 now = datetime.datetime.now()
 current_time_str = now.strftime("%A, %B %d, %Y at %I:%M:%S %p")
-
 st.caption(f"Taal Lake Dashboard | BULASO - DENNA - EJERCITADO - ESPINO - INCIONG | {current_time_str}")
-st.markdown("---") # Final separator
+st.markdown("---")
