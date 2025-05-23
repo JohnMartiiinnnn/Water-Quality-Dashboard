@@ -98,6 +98,10 @@ tab_style = f"""
 st.markdown(f"""
 <style>
     {font_style}
+    .stApp {{
+    background-color: #ffffff !important;
+    color: #222831 !important;
+    
     .block-container {{
         max-width: 1200px !important;
         padding: 3rem 0rem !important;
