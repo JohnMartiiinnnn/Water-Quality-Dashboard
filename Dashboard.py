@@ -177,35 +177,48 @@ tab1, tab3, tab4, tab_info = st.tabs(["🏠 Homepage", "📈 Visualizations", "�
 
 # ==== TAB 1: Homepage ====
 with tab1:
-    # Add CSS to style the full-width GIF
-    st.markdown("""
-    <style>
-    .full-width-gif {
-        max-width: 1200px !important;
-        display: block;
-        margin: 0 auto; /* Center the GIF */
-        margin-top: 3rem; /* Move GIF upward to offset block-container padding */
-        border-radius: 8px; /* Add rounded corners */
-    }
-    .greeting-message {
-        text-align: center;
-        margin-bottom: 1rem; /* Space between greeting and GIF */
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # Load and display the GIF
-    try:
-        with open("images/homepage.gif", "rb") as img_file:
-            img_base64 = base64.b64encode(img_file.read()).decode()
-        st.markdown(
-            f'<img src="data:image/gif;base64,{img_base64}" class="full-width-gif" alt="Homepage GIF">',
-            unsafe_allow_html=True
-        )
-    except FileNotFoundError:
-        st.warning("homepage.gif not found in the images folder. Please ensure the file exists.")
-    except Exception as e:
-        st.error(f"Error loading homepage.gif: {e}")
+    with st.container():
+        st.markdown("""
+        <style>
+        .gif-container {
+            width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .gif-container img {
+            width: 100%;
+            max-width: 1200px;
+            height: auto;
+            display: block;
+        }
+        @media (max-width: 1200px) {
+            .gif-container {
+                width: 100%;
+                max-width: 1200px;
+            }
+            .gif-container img {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+        </style>
+        <div class="gif-container">
+        """, unsafe_allow_html=True)
+        
+        try:
+            with open("images/homepage.gif", "rb") as img_file:
+                img_base64 = base64.b64encode(img_file.read()).decode()
+            st.markdown(
+                f'<img src="data:image/gif;base64,{img_base64}" alt="Homepage GIF">',
+                unsafe_allow_html=True
+            )
+        except FileNotFoundError:
+            st.warning("homepage.gif not found in the images folder. Please ensure the file exists in the repository.")
+        except Exception as e:
+            st.error(f"Error loading homepage.gif: {e}")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
 with tab3:
     # Initialize session state for visualization selection
