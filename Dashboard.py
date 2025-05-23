@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+
 # ==== PAGE CONFIG ====
 st.set_page_config(page_title="Water Quality Dashboard", page_icon="📊", layout="wide")
 
@@ -101,7 +102,7 @@ st.markdown(f"""
     .block-container {{
         max-width: 1200px !important;
         padding: 3rem 0rem !important;
-        margin:  0 5px 5px 5 px !important;
+        margin:  0 5px 5px 5px !important;
     }}
     .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
     .section-header, .custom-label, .stTabs [data-baseweb="tab"] p,
@@ -170,17 +171,17 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
+
 # ==== TABS ====
 tab1, tab3, tab4, tab_info = st.tabs(["🏠 Homepage", "📈 Visualizations", "🔮 Prediction", "ℹ️ About"])
 
-# ==== TAB 1: Homepage ====
 # ==== TAB 1: Homepage ====
 with tab1:
     # Add CSS to style the full-width GIF
     st.markdown("""
     <style>
     .full-width-gif {
-        max-width: 1200px; /* Matches .block-container max-width */
+        max-width: 1200px !important;
         display: block;
         margin: 0 auto; /* Center the GIF */
         margin-top: 3rem; /* Move GIF upward to offset block-container padding */
