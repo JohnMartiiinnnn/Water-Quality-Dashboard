@@ -98,14 +98,10 @@ tab_style = f"""
 st.markdown(f"""
 <style>
     {font_style}
-    .stApp {{
-    background-color: #ffffff !important;
-    color: #222831 !important;
-    
     .block-container {{
         max-width: 1200px !important;
         padding: 3rem 0rem !important;
-        margin: 0 auto !important;
+        margin:  0 5px 5px 5 px !important;
     }}
     .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
     .section-header, .custom-label, .stTabs [data-baseweb="tab"] p,
@@ -184,7 +180,7 @@ with tab1:
     st.markdown("""
     <style>
     .full-width-gif {
-        max-width: 1200px; /* Matches .block-container max-width */
+        max-width: 2000px; /* Matches .block-container max-width */
         display: block;
         margin: 0 auto; /* Center the GIF */
         margin-top: 3rem; /* Move GIF upward to offset block-container padding */
@@ -882,11 +878,39 @@ with tab3:
                                 st.error("No Water Quality data loaded. Cannot display site comparison.")
             else:
                 st.error("No data loaded. Cannot display line chart.")
+    try:
+        with open("images/footer.png", "rb") as img_file:
+            img_base64 = base64.b64encode(img_file.read()).decode()
+        st.markdown(
+            f'<img src="data:image/png;base64,{img_base64}" alt="Footer" '
+            f'style=" border-radius: 0 0 8px 8px; max-width: 1190px; margin: 0 auto;">',
+            unsafe_allow_html=True
+        )
+    except FileNotFoundError:
+        st.warning("footer.png not found in the images folder. Please ensure the file exists in the repository.")
+    except Exception as e:
+        st.error(f"Error loading footer.png: {e}")
+    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
 
 # ==== TAB 4: Prediction ====
 with tab4:
     st.info("This section is under development.")
 
+    try:
+        with open("images/footer.png", "rb") as img_file:
+            img_base64 = base64.b64encode(img_file.read()).decode()
+        st.markdown(
+            f'<img src="data:image/png;base64,{img_base64}" alt="Footer" '
+            f'style=" border-radius: 0 0 8px 8px; max-width: 1190px; margin: 0 auto;">',
+            unsafe_allow_html=True
+        )
+    except FileNotFoundError:
+        st.warning("footer.png not found in the images folder. Please ensure the file exists in the repository.")
+    except Exception as e:
+        st.error(f"Error loading footer.png: {e}")
+    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
+
+# ==== TAB INFO: About ====
 with tab_info:
     st.markdown(
         "<div class='custom-text-primary' style='font-size: 22px; text-align: justify;'>Dataset Information</div>",
@@ -1038,5 +1062,18 @@ with tab_info:
             except Exception as e:
                 st.error(f"Error loading {dev['img']}: {e}")
             st.markdown(f"**{dev['name']}**<br>Phone: {dev['phone']}<br>Email: {dev['email']}", unsafe_allow_html=True)
+
+    try:
+        with open("images/footer.png", "rb") as img_file:
+            img_base64 = base64.b64encode(img_file.read()).decode()
+        st.markdown(
+            f'<img src="data:image/png;base64,{img_base64}" alt="Footer" '
+            f'style=" border-radius: 0 0 8px 8px; max-width: 1190px; margin: 0 auto;">',
+            unsafe_allow_html=True
+        )
+    except FileNotFoundError:
+        st.warning("footer.png not found in the images folder. Please ensure the file exists in the repository.")
+    except Exception as e:
+        st.error(f"Error loading footer.png: {e}")
     st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
-st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
+
