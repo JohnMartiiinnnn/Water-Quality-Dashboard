@@ -430,73 +430,75 @@ with tab3:
             else:
                 st.error("Water Quality data not loaded. Cannot display scatter plots.")
         elif visualization == "Distributions":
-            if not bfar_df.empty or not philvolcs_df.empty:
-                bfar_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
-                                      if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition',
-                                                     'Wind Direction']
-                                      and bfar_df[col].notna().any()])
-                philvolcs_params = sorted([col for col in philvolcs_df.select_dtypes(include=np.number).columns
-                                           if col not in ['Year', 'Month', 'Day', 'Latitude', 'Longitude']
-                                           and philvolcs_df[col].notna().any()])
-                param_options = ([f"{param} (Water Quality)" for param in bfar_params] +
-                                 [f"{param} (PHIVOLCS)" for param in philvolcs_params])
-                if not param_options:
-                    st.warning("No numeric parameters available for distribution plots.")
+    if not bfar_df.empty or not philvolcs_df.empty:
+        bfar_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
+                              if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition',
+                                             'Wind Direction']
+                              and bfar_df[col].notna().any()])
+        philvolcs_params = sorted([col for col in philvolcs_df.select_dtypes(include=np.number).columns
+                                   if col not in ['Year', 'Month', 'Day', 'Latitude', 'Longitude']
+                                   and philvolcs_df[col].notna().any()])
+        param_options = ([f"{param} (Water Quality)" for param in bfar_params] +
+                         [f"{param} (PHIVOLCS)" for param in philvolcs_params])
+        if not param_options:
+            st.warning("No numeric parameters available for distribution plots.")
+        else:
+            col1, col2 = st.columns([5, 2])
+            with col2:
+                st.markdown(
+                    "<div class='custom-text-primary' style='margin-bottom: 0px; margin-top: 0px; "
+                    "font-size: 17px; text-align: justify;'>Distributions Configuration</div>",
+                    unsafe_allow_html=True)
+                selected_param = st.selectbox("Select Parameter for Distribution:", param_options,
+                                              index=0, key="dist_param")
+                sites = ['All Sites'] + sorted(bfar_df['Site'].astype(str).unique()) if not bfar_df.empty else [
+                    'All Sites']
+                selected_site = st.selectbox("Filter by Site (Optional, Water Quality only):", sites,
+                                             key="dist_site_filter")
+                min_date = bfar_df['Date'].min() if not bfar_df.empty else philvolcs_df['Date'].min()
+                max_date = bfar_df['Date'].max() if not bfar_df.empty else philvolcs_df['Date'].max()
+                show_trend_line = st.checkbox("Show Trend Line", value=False, key="dist_trend_line")
+                start_date = st.date_input("Start Date (Optional):", value=None, min_value=min_date,
+                                           max_value=max_date,
+                                           key="dist_start_date")
+                end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date,
+                                         max_value=max_date,
+                                         key="dist_end_date")
+            with col1:
+                param_name = selected_param.split(" (")[0]
+                dataset = selected_param.split(" (")[1].rstrip(")")
+                if dataset == "Water Quality" and not bfar_df.empty:
+                    filtered_df = bfar_df.copy()
+                    if selected_site != 'All Sites':
+                        filtered_df = filtered_df[filtered_df['Site'] == selected_site]
+                elif dataset == "PHIVOLCS" and not philvolcs_df.empty:
+                    filtered_df = philvolcs_df.copy()
                 else:
-                    col1, col2 = st.columns([5, 2])
-                    with col2:
-                        st.markdown(
-                            "<div class='custom-text-primary' style='margin-bottom: 0px; margin-top: 0px; "
-                            "font-size: 17px; text-align: justify;'>Distributions Configuration</div>",
-                            unsafe_allow_html=True)
-                        selected_param = st.selectbox("Select Parameter for Distribution:", param_options,
-                                                      index=0, key="dist_param")
-                        sites = ['All Sites'] + sorted(bfar_df['Site'].astype(str).unique()) if not bfar_df.empty else [
-                            'All Sites']
-                        selected_site = st.selectbox("Filter by Site (Optional, Water Quality only):", sites,
-                                                     key="dist_site_filter")
-                        min_date = bfar_df['Date'].min() if not bfar_df.empty else philvolcs_df['Date'].min()
-                        max_date = bfar_df['Date'].max() if not bfar_df.empty else philvolcs_df['Date'].max()
-                        show_trend_line = st.checkbox("Show Trend Line", value=False, key="dist_trend_line")
-                        start_date = st.date_input("Start Date (Optional):", value=None, min_value=min_date,
-                                                   max_value=max_date,
-                                                   key="dist_start_date")
-                        end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date,
-                                                 max_value=max_date,
-                                                 key="dist_end_date")
-                    with col1:
-                        param_name = selected_param.split(" (")[0]
-                        dataset = selected_param.split(" (")[1].rstrip(")")
-                        if dataset == "Water Quality" and not bfar_df.empty:
-                            filtered_df = bfar_df.copy()
-                            if selected_site != 'All Sites':
-                                filtered_df = filtered_df[filtered_df['Site'] == selected_site]
-                        elif dataset == "PHIVOLCS" and not philvolcs_df.empty:
-                            filtered_df = philvolcs_df.copy()
+                    filtered_df = pd.DataFrame()
+                if not filtered_df.empty:
+                    if start_date and end_date:
+                        start_date = pd.to_datetime(start_date)
+                        end_date = pd.to_datetime(end_date)
+                        if start_date > end_date:
+                            st.error("Error: Start date cannot be after end date.")
                         else:
-                            filtered_df = pd.DataFrame()
-                        if not filtered_df.empty:
-                            if start_date and end_date:
-                                start_date = pd.to_datetime(start_date)
-                                end_date = pd.to_datetime(end_date)
-                                if start_date > end_date:
-                                    st.error("Error: Start date cannot be after end date.")
-                                else:
-                                    filtered_df = filtered_df[(filtered_df['Date'] >= start_date) &
-                                                              (filtered_df['Date'] <= end_date)]
-                            elif start_date:
-                                filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
-                            elif end_date:
-                                filtered_df = filtered_df[filtered_df['Date'] <= pd.to_datetime(end_date)]
-                            data = filtered_df[param_name].dropna()
-                            title = f"Distribution of {param_name} ({dataset}) in {selected_site}"
-                            if not data.empty:
-                                fig_hist = px.histogram(data, x=param_name, nbins=30, title=title,
-                                                        color_discrete_sequence=['#004A99'])
-                                fig_hist.update_traces(opacity=0.75)
-                                if show_trend_line:
-                                    from scipy.stats import gaussian_kde
-                                    import numpy as np
+                            filtered_df = filtered_df[(filtered_df['Date'] >= start_date) &
+                                                      (filtered_df['Date'] <= end_date)]
+                    elif start_date:
+                        filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
+                    elif end_date:
+                        filtered_df = filtered_df[filtered_df['Date'] <= pd.to_datetime(end_date)]
+                    data = filtered_df[param_name].dropna()
+                    title = f"Distribution of {param_name} ({dataset}) in {selected_site}"
+                    if not data.empty:
+                        fig_hist = px.histogram(data, x=param_name, nbins=30, title=title,
+                                                color_discrete_sequence=['#004A99'])
+                        fig_hist.update_traces(opacity=0.75)
+                        if show_trend_line:
+                            try:
+                                from scipy.stats import gaussian_kde
+                                import numpy as np
+                                if len(data) >= 2 and data.nunique() > 1:  # Check for sufficient data and variability
                                     kde = gaussian_kde(data)
                                     x_range = np.linspace(data.min(), data.max(), 100)
                                     kde_vals = kde(x_range)
@@ -511,26 +513,31 @@ with tab3:
                                         showlegend=False,  # Hide in legend
                                         line=dict(color='red', width=2)
                                     )
-                                fig_hist.update_layout(
-                                    showlegend=False,  # No legend for histogram or KDE
-                                    plot_bgcolor='white',
-                                    paper_bgcolor='white',
-                                    height=500,
-                                    xaxis_title=param_name,
-                                    title_font=dict(
-                                        size=18,
-                                        family='Montserrat' if font_base64 else 'sans-serif'
-                                    ),
-                                    title_x=0.03,
-                                    margin=dict(l=00, r=0, t=40, b=0),
-                                    yaxis_title="Count",
-                                    font=dict(family='Montserrat' if font_base64 else 'sans-serif')
-                                )
-                                st.plotly_chart(fig_hist, use_container_width=True)
-                            else:
-                                st.warning(f"No data available for {selected_param} after applying filters.")
-                        else:
-                            st.warning(f"No data available for {selected_param}.")
+                                else:
+                                    st.warning("Not enough data or variability in the selected range to compute KDE trend line.")
+                            except Exception as e:
+                                st.warning("Not enough data or variability in the selected range to compute KDE trend line.")
+                        fig_hist.update_layout(
+                            showlegend=False,  # No legend for histogram or KDE
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            height=500,
+                            xaxis_title=param_name,
+                            title_font=dict(
+                                size=18,
+                                family='Montserrat' if font_base64 else 'sans-serif'
+                            ),
+                            title_x=0.03,
+                            margin=dict(l=00, r=0, t=40, b=0),
+                            yaxis_title="Count",
+                            font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                        )
+                        st.plotly_chart(fig_hist, use_container_width=True)
+                    else:
+                        st.warning(f"No data available for {selected_param} after applying filters.")
+                else:
+                    st.warning(f"No data available for {selected_param}.")
+                            
         elif visualization == "Histogram":
             if not bfar_df.empty or not philvolcs_df.empty:
                 bfar_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
