@@ -30,31 +30,18 @@ def load_data():
     bfar_df = pd.DataFrame()
     philvolcs_df = pd.DataFrame()
     try:
-        bfar_df = pd.read_csv('datasets/cleaned_dataset.csv')
-        if 'Date' in bfar_df.columns:
-            bfar_df['Date'] = pd.to_datetime(bfar_df['Date'], errors='coerce')
-        else:
-            st.error("'cleaned_dataset.csv' must contain a 'Date' column.")
-            bfar_df = pd.DataFrame()
-        numeric_cols = ['Year', 'Month', 'Surface Temperature', 'Middle Temperature', 'pH', 'Ammonia',
-                        'Nitrate', 'Phosphate', 'Dissolved Oxygen', 'Air Temperature', 'Seismicity',
-                        'Acidity', 'Temperature (in Celsius)', 'SO2', 'Plume (in meters)', 'Ground Deformation']
-        for col in numeric_cols:
-            if col in bfar_df.columns:
-                bfar_df[col] = pd.to_numeric(bfar_df[col], errors='coerce')
+        bfar_df = pd.read_parquet('datasets/cleaned_dataset.parquet', engine='pyarrow')
     except FileNotFoundError:
-        st.error("cleaned_dataset.csv not found.")
+        st.error("cleaned_dataset.parquet not found.")
     except Exception as e:
-        st.error(f"Error loading cleaned_dataset.csv: {e}")
+        st.error(f"Error loading cleaned_dataset.parquet: {e}")
 
     try:
-        philvolcs_df = pd.read_csv('datasets/PHIVOLCS.csv')
-        if 'Date' in philvolcs_df.columns:
-            philvolcs_df['Date'] = pd.to_datetime(philvolcs_df['Date'], errors='coerce')
+        philvolcs_df = pd.read_parquet('datasets/PHIVOLCS.parquet', engine='pyarrow')
     except FileNotFoundError:
-        st.error("PHIVOLCS.csv not found.")
+        st.error("PHIVOLCS.parquet not found.")
     except Exception as e:
-        st.error(f"Error loading PHIVOLCS.csv: {e}")
+        st.error(f"Error loading PHIVOLCS.parquet: {e}")
 
     return bfar_df, philvolcs_df
 
@@ -1038,18 +1025,18 @@ with tab_info:
     bfar_raw_df = pd.DataFrame()
     philvolcs_raw_df = pd.DataFrame()
     try:
-        bfar_raw_df = pd.read_csv('datasets/BFAR.csv')
+        bfar_raw_df = pd.read_parquet('datasets/BFAR.parquet', engine='pyarrow')
     except FileNotFoundError:
-        st.error("BFAR.csv not found.")
+        st.error("BFAR.parquet not found.")
     except Exception as e:
-        st.error(f"Error loading BFAR.csv: {e}")
+        st.error(f"Error loading BFAR.parquet: {e}")
 
     try:
-        philvolcs_raw_df = pd.read_csv('datasets/PHIVOLCS.csv')
+        philvolcs_raw_df = pd.read_parquet('datasets/PHIVOLCS.parquet', engine='pyarrow')
     except FileNotFoundError:
-        st.error("PHIVOLCS.csv not found.")
+        st.error("PHIVOLCS.parquet not found.")
     except Exception as e:
-        st.error(f"Error loading PHIVOLCS.csv: {e}")
+        st.error(f"Error loading PHIVOLCS.parquet: {e}")
 
     col1, col2, col3 = st.columns([10, 0.5, 10])
     with col1:
@@ -1067,9 +1054,9 @@ with tab_info:
             except Exception as e:
                 st.error(f"Error loading BFAR.png: {e}")
         with colC:
-            st.markdown("""
+            st.markdown(""" 
                 <div class='custom-text-primary' style='margin-top: 23px; font-size: 30px; text-align: left; color: #023AA8;'>Water Quality Dataset</div>
-                <div class='custom-text-secondary' style='margin-bottom: 27px; color: #4E94DC; font-size: 15px; text-align: left;'>(Source: BFAR.csv)</div>
+                <div class='custom-text-secondary' style='margin-bottom: 27px; color: #4E94DC; font-size: 15px; text-align: left;'>(BFAR)</div>
             """, unsafe_allow_html=True)
         if not bfar_raw_df.empty:
             st.markdown(f"**Shape:** {bfar_raw_df.shape[0]} rows × {bfar_raw_df.shape[1]} columns")
@@ -1085,7 +1072,7 @@ with tab_info:
             with st.expander("Water Quality Dataset Preview (First 20 rows)"):
                 st.dataframe(bfar_raw_df.head(20), height=250)
         else:
-            st.warning("Water Quality data (BFAR.csv) not loaded.")
+            st.warning("Water Quality data (BFAR.parquet) not loaded.")
 
     with col3:
         colA_ph, colB_ph, colC_ph = st.columns([3, 0.05, 10])
@@ -1104,7 +1091,7 @@ with tab_info:
         with colC_ph:
             st.markdown("""
                 <div class='custom-text-primary' style='margin-top: 18px; font-size: 30px; text-align: left; color: #222831;'>PHIVOLCS Dataset</div>
-                <div class='custom-text-secondary' style='margin-bottom: 27px;color: #43B5C3; font-size: 18px; text-align: left;'>(Volcanic Activity, Source: PHIVOLCS.csv)</div>
+                <div class='custom-text-secondary' style='margin-bottom: 27px;color: #43B5C3; font-size: 18px; text-align: left;'>(Volcanic Activity)</div>
             """, unsafe_allow_html=True)
         if not philvolcs_raw_df.empty:
             st.markdown(f"**Shape:** {philvolcs_raw_df.shape[0]} rows × {philvolcs_raw_df.shape[1]} columns")
@@ -1120,7 +1107,7 @@ with tab_info:
             with st.expander("PHIVOLCS Dataset Preview (First 20 rows)"):
                 st.dataframe(philvolcs_raw_df.head(20), height=250)
         else:
-            st.warning("PHIVOLCS data (PHIVOLCS.csv) not loaded.")
+            st.warning("PHIVOLCS data (PHIVOLCS.parquet) not loaded.")
 
     st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
 
