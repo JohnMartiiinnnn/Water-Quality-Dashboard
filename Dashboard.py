@@ -887,7 +887,6 @@ with tab3:
 with tab4:
     st.info("This section is under development.")
 
-# ==== TAB INFO: About ====
 with tab_info:
     st.markdown(
         "<div class='custom-text-primary' style='font-size: 22px; text-align: justify;'>Dataset Information</div>",
@@ -915,13 +914,20 @@ with tab_info:
         colA, colB, colC = st.columns([3, 0.05, 10])
         with colA:
             try:
-                st.image("images/BFAR.png", width=100)
+                with open("images/BFAR.png", "rb") as img_file:
+                    img_base64 = base64.b64encode(img_file.read()).decode()
+                st.markdown(
+                    f'<img src="data:image/png;base64,{img_base64}" width="100" alt="BFAR Logo">',
+                    unsafe_allow_html=True
+                )
             except FileNotFoundError:
-                st.warning("BFAR.png not found.")
+                st.warning("BFAR.png not found in the images folder. Please ensure the file exists in the repository.")
+            except Exception as e:
+                st.error(f"Error loading BFAR.png: {e}")
         with colC:
             st.markdown("""
                 <div class='custom-text-primary' style='margin-top: 23px; font-size: 30px; text-align: left; color: #023AA8;'>Water Quality Dataset</div>
-                <div class='custom-text-secondary' style='color: #4E94DC; font-size: 15px; text-align: left;'>(Source: BFAR.csv)</div>
+                <div class='custom-text-secondary' style='margin-bottom: 27px; color: #4E94DC; font-size: 15px; text-align: left;'>(Source: BFAR.csv)</div>
             """, unsafe_allow_html=True)
         if not bfar_raw_df.empty:
             st.markdown(f"**Shape:** {bfar_raw_df.shape[0]} rows × {bfar_raw_df.shape[1]} columns")
@@ -943,9 +949,16 @@ with tab_info:
         colA_ph, colB_ph, colC_ph = st.columns([3, 0.05, 10])
         with colA_ph:
             try:
-                st.image("images/PHIVOLCS.png", width=100)
+                with open("images/PHIVOLCS.png", "rb") as img_file:
+                    img_base64 = base64.b64encode(img_file.read()).decode()
+                st.markdown(
+                    f'<img src="data:image/png;base64,{img_base64}" width="100" alt="PHIVOLCS Logo">',
+                    unsafe_allow_html=True
+                )
             except FileNotFoundError:
-                st.warning("PHIVOLCS.png not found.")
+                st.warning("PHIVOLCS.png not found in the images folder. Please ensure the file exists in the repository.")
+            except Exception as e:
+                st.error(f"Error loading PHIVOLCS.png: {e}")
         with colC_ph:
             st.markdown("""
                 <div class='custom-text-primary' style='margin-top: 18px; font-size: 30px; text-align: left; color: #222831;'>PHIVOLCS Dataset</div>
@@ -974,9 +987,17 @@ with tab_info:
     col_taal1, col_taal2, col_taal3 = st.columns([5, 0.5, 10])
     with col_taal1:
         try:
-            st.image("images/Taal-volcano-map.jpg", caption="Image from: ShelterBox USA")
+            with open("images/Taal-volcano-map.jpg", "rb") as img_file:
+                img_base64 = base64.b64encode(img_file.read()).decode()
+            st.markdown(
+                f'<img src="data:image/jpeg;base64,{img_base64}" alt="Taal Volcano Map" style="width: 100%;">',
+                unsafe_allow_html=True
+            )
+            st.caption("Image from: ShelterBox USA")
         except FileNotFoundError:
-            st.warning("Taal-volcano-map.jpg not found.")
+            st.warning("Taal-volcano-map.jpg not found in the images folder. Please ensure the file exists in the repository.")
+        except Exception as e:
+            st.error(f"Error loading Taal-volcano-map.jpg: {e}")
     with col_taal3:
         st.markdown(f"<div style='text-align: justify; font-size: 19px; color: #393E46;'>{taal_info}</div>",
                     unsafe_allow_html=True)
@@ -994,7 +1015,7 @@ with tab_info:
         {"name": "DENNA, ALEXA YVONNE V.", "phone": "+639184719122", "email": "main.alexayvonne.denna@cvsu.edu.ph",
          "img": "1x1/alexa.jpg"},
         {"name": "EJERCITADO, JOHN MARTIN P.", "phone": "+639262333664",
-         "email": "main.johnmartin.ejercitado@cvsu.edu.ph>  }", "img": "1x1/martin.png"},
+         "email": "main.johnmartin.ejercitado@cvsu.edu.ph", "img": "1x1/martin.png"},
         {"name": "ESPINO, GIAN JERICHO Z.", "phone": "+639108733830", "email": "main.gianjericho.espino@cvsu.edu.ph",
          "img": "1x1/gian.jpg"},
         {"name": "INCIONG, HARLEY EVANGEL J.", "phone": "+639516120316",
@@ -1006,8 +1027,16 @@ with tab_info:
     for i, dev in enumerate(developers):
         with cols[i % 3]:
             try:
-                st.image(dev["img"], width=100)
+                with open(dev["img"], "rb") as img_file:
+                    img_base64 = base64.b64encode(img_file.read()).decode()
+                st.markdown(
+                    f'<img src="data:image/jpeg;base64,{img_base64}" width="100" alt="{dev["name"]} Photo">',
+                    unsafe_allow_html=True
+                )
             except FileNotFoundError:
-                st.warning(f"{dev['img']} not found.")
+                st.warning(f"{dev['img']} not found in the 1x1 folder. Please ensure the file exists in the repository.")
+            except Exception as e:
+                st.error(f"Error loading {dev['img']}: {e}")
             st.markdown(f"**{dev['name']}**<br>Phone: {dev['phone']}<br>Email: {dev['email']}", unsafe_allow_html=True)
+    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
 st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
