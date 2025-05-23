@@ -180,7 +180,7 @@ with tab1:
     st.markdown("""
     <style>
     .full-width-gif {
-        max-width: 2000px; /* Matches .block-container max-width */
+        max-width: 1200px; /* Matches .block-container max-width */
         display: block;
         margin: 0 auto; /* Center the GIF */
         margin-top: 3rem; /* Move GIF upward to offset block-container padding */
