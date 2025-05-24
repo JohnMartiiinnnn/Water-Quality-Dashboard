@@ -283,81 +283,81 @@ with tab3:
         visualization = st.session_state.visualization
 
     elif visualization == "Correlation Matrix":
-    if not bfar_df.empty:
-        numeric_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
-                                if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
-                                and bfar_df[col].notna().any()])
-        if len(numeric_params) < 2:
-            st.warning("At least two numeric parameters are required for correlation matrix.")
-        else:
-            col1, col2 = st.columns([5, 2])
-            with col2:
-                st.markdown(
-                    "<div class='custom-text-primary' style='margin-bottom: 0px; margin-top: 0px; "
-                    "font-size: 17px; text-align: justify;'>Correlation Matrix Configuration</div>",
-                    unsafe_allow_html=True)
-                sites = ['All Sites'] + sorted(bfar_df['Site'].astype(str).unique())
-                selected_site = st.selectbox("Filter by Site (Optional):", sites, key="corr_site_filter")
-                min_date = bfar_df['Date'].min()
-                max_date = bfar_df['Date'].max()
-                start_date = st.date_input("Start Date (Optional):", value=None, min_value=min_date,
-                                           max_value=max_date, key="corr_start_date")
-                end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date,
-                                         max_value=max_date, key="corr_end_date")
-            with col1:
-                try:
-                    filtered_df = bfar_df.copy()
-                    if selected_site != 'All Sites':
-                        filtered_df = filtered_df[filtered_df['Site'] == selected_site]
-                    if start_date and end_date:
-                        start_date = pd.to_datetime(start_date)
-                        end_date = pd.to_datetime(end_date)
-                        if start_date > end_date:
-                            st.error("Error: Start date cannot be after end date.")
+        if not bfar_df.empty:
+            numeric_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
+                                    if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
+                                    and bfar_df[col].notna().any()])
+            if len(numeric_params) < 2:
+                st.warning("At least two numeric parameters are required for correlation matrix.")
+            else:
+                col1, col2 = st.columns([5, 2])
+                with col2:
+                    st.markdown(
+                        "<div class='custom-text-primary' style='margin-bottom: 0px; margin-top: 0px; "
+                        "font-size: 17px; text-align: justify;'>Correlation Matrix Configuration</div>",
+                        unsafe_allow_html=True)
+                    sites = ['All Sites'] + sorted(bfar_df['Site'].astype(str).unique())
+                    selected_site = st.selectbox("Filter by Site (Optional):", sites, key="corr_site_filter")
+                    min_date = bfar_df['Date'].min()
+                    max_date = bfar_df['Date'].max()
+                    start_date = st.date_input("Start Date (Optional):", value=None, min_value=min_date,
+                                               max_value=max_date, key="corr_start_date")
+                    end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date,
+                                             max_value=max_date, key="corr_end_date")
+                with col1:
+                    try:
+                        filtered_df = bfar_df.copy()
+                        if selected_site != 'All Sites':
+                            filtered_df = filtered_df[filtered_df['Site'] == selected_site]
+                        if start_date and end_date:
+                            start_date = pd.to_datetime(start_date)
+                            end_date = pd.to_datetime(end_date)
+                            if start_date > end_date:
+                                st.error("Error: Start date cannot be after end date.")
+                                st.stop()
+                            filtered_df = filtered_df[(filtered_df['Date'] >= start_date) &
+                                                     (filtered_df['Date'] <= end_date)]
+                        elif start_date:
+                            filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
+                        elif end_date:
+                            filtered_df = filtered_df[filtered_df['Date'] <= pd.to_datetime(end_date)]
+                        filtered_df = filtered_df[numeric_params].dropna()
+                        if filtered_df.empty:
+                            st.warning("No data available for the selected parameters and filters.")
                             st.stop()
-                        filtered_df = filtered_df[(filtered_df['Date'] >= start_date) &
-                                                 (filtered_df['Date'] <= end_date)]
-                    elif start_date:
-                        filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
-                    elif end_date:
-                        filtered_df = filtered_df[filtered_df['Date'] <= pd.to_datetime(end_date)]
-                    filtered_df = filtered_df[numeric_params].dropna()
-                    if filtered_df.empty:
-                        st.warning("No data available for the selected parameters and filters.")
+                        if len(filtered_df) < 2:
+                            st.warning("Not enough data points (minimum 2 required) to generate correlation matrix.")
+                            st.stop()
+                        corr_matrix = filtered_df.corr().round(2)
+                        fig_heatmap = go.Figure(data=go.Heatmap(
+                            z=corr_matrix.values,
+                            x=corr_matrix.columns,
+                            y=corr_matrix.columns,
+                            colorscale='RdBu',
+                            zmin=-1,
+                            zmax=1,
+                            text=corr_matrix.values,
+                            texttemplate="%{text:.2f}",
+                            hoverinfo="z",
+                            showscale=True
+                        ))
+                        fig_heatmap.update_layout(
+                            height=500,
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            title="Correlation Matrix",
+                            title_font=dict(
+                                size=18,
+                                family='Montserrat' if font_base64 else 'sans-serif'
+                            ),
+                            title_x=0.03,
+                            margin=dict(l=20, r=20, t=60, b=20),
+                            font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                        )
+                        st.plotly_chart(fig_heatmap, use_container_width=True)
+                    except Exception as e:
+                        st.error(f"Error generating correlation matrix: {str(e)}")
                         st.stop()
-                    if len(filtered_df) < 2:
-                        st.warning("Not enough data points (minimum 2 required) to generate correlation matrix.")
-                        st.stop()
-                    corr_matrix = filtered_df.corr().round(2)
-                    fig_heatmap = go.Figure(data=go.Heatmap(
-                        z=corr_matrix.values,
-                        x=corr_matrix.columns,
-                        y=corr_matrix.columns,
-                        colorscale='RdBu',
-                        zmin=-1,
-                        zmax=1,
-                        text=corr_matrix.values,
-                        texttemplate="%{text:.2f}",
-                        hoverinfo="z",
-                        showscale=True
-                    ))
-                    fig_heatmap.update_layout(
-                        height=500,
-                        plot_bgcolor='white',
-                        paper_bgcolor='white',
-                        title="Correlation Matrix",
-                        title_font=dict(
-                            size=18,
-                            family='Montserrat' if font_base64 else 'sans-serif'
-                        ),
-                        title_x=0.03,
-                        margin=dict(l=20, r=20, t=60, b=20),
-                        font=dict(family='Montserrat' if font_base64 else 'sans-serif')
-                    )
-                    st.plotly_chart(fig_heatmap, use_container_width=True)
-                except Exception as e:
-                    st.error(f"Error generating correlation matrix: {str(e)}")
-                    st.stop()
     else:
         st.error("Water Quality data not loaded. Cannot display correlation matrix.")
         st.stop()
