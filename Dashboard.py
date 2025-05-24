@@ -86,7 +86,7 @@ st.markdown(f"""
 <style>
     {font_style}
     .block-container {{
-        max-width: 1200px !important;
+        max-width: 98% !important;
         padding: 3rem 0rem 3rem 0rem !important;  # Adjusted bottom padding for footer
         margin: 0 5px 5px 5px !important;
     }}
@@ -157,7 +157,7 @@ st.markdown(f"""
     .custom-text-secondary {{ color: #393E46; font-size: 16px; }}
     
     .full-width-footer {{
-        max-width: 1200px !important;
+        max-width: 100% !important;
         display: block;
         margin: 0 auto;
         border-radius: 0 0 8px 8px;
