@@ -205,9 +205,6 @@ with tab1:
 
     st.markdown("<div class='custom-divider' style='margin-bottom: 7rem;'></div>", unsafe_allow_html=True)
 
-# Only the modified parts of the Visualizations tab (tab3) are included.
-# Replace the corresponding sections in the original Dashboard.py.
-
 with tab3:
     set_active_tab("Visualizations")
     if 'visualization' not in st.session_state:
@@ -219,7 +216,7 @@ with tab3:
         transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
         background-color: rgba(128, 150, 173, 0.15) !important;
         border-radius: 8px !important;
-        padding: 0px 15px !important;
+        padding: 0px 13px !important;
         width: 180px !important; 
         text-align: center !important;
         color: #002244 !important;
@@ -272,7 +269,8 @@ with tab3:
             "Distributions",
             "Histogram",
             "Box Plot",
-            "Line Chart"
+            "Line Chart",
+            "Descriptive Analytics",
         ]
         for option in visualization_options:
             is_selected = st.session_state.visualization == option
@@ -372,7 +370,8 @@ with tab3:
         elif visualization == "Scatter Plots":
             if not bfar_df.empty:
                 numeric_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
-                                         if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
+                                         if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition',
+                                                        'Wind Direction']
                                          and bfar_df[col].notna().any()])
                 if len(numeric_params) < 2:
                     st.warning("At least two numeric parameters are required for scatter plots.")
@@ -388,33 +387,61 @@ with tab3:
                                               index=1 if len(numeric_params) > 1 else 0, key="scatter_y")
                         sites = ['All Sites'] + sorted(bfar_df['Site'].astype(str).unique())
                         selected_site = st.selectbox("Filter by Site (Optional):", sites, key="scatter_site_filter")
+                        show_best_fit = st.checkbox("Show Best-Fit Line", value=True, key="scatter_best_fit")
                         min_date = bfar_df['Date'].min()
                         max_date = bfar_df['Date'].max()
                         start_date = st.date_input("Start Date (Optional):", value=None, min_value=min_date,
-                                                   max_value=max_date,
-                                                   key="scatter_start_date")
-                        end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date, max_value=max_date,
-                                                 key="scatter_end_date")
+                                                   max_value=max_date, key="scatter_start_date")
+                        end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date,
+                                                 max_value=max_date, key="scatter_end_date")
+
                     with col1:
-                        filtered_df = bfar_df.copy()
-                        if selected_site != 'All Sites':
-                            filtered_df = filtered_df[filtered_df['Site'] == selected_site]
-                        if start_date and end_date:
-                            start_date = pd.to_datetime(start_date)
-                            end_date = pd.to_datetime(end_date)
-                            if start_date > end_date:
-                                st.error("Error: Start date cannot be after end date.")
-                            else:
+                        try:
+                            filtered_df = bfar_df.copy()
+                            if selected_site != 'All Sites':
+                                filtered_df = filtered_df[filtered_df['Site'] == selected_site]
+                            if start_date and end_date:
+                                start_date = pd.to_datetime(start_date)
+                                end_date = pd.to_datetime(end_date)
+                                if start_date > end_date:
+                                    st.error("Error: Start date cannot be after end date.")
+                                    st.stop()
                                 filtered_df = filtered_df[(filtered_df['Date'] >= start_date) &
                                                           (filtered_df['Date'] <= end_date)]
-                        elif start_date:
-                            filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
-                        elif end_date:
-                            filtered_df = filtered_df[filtered_df['Date'] <= pd.to_datetime(end_date)]
-                        filtered_df = filtered_df.dropna(subset=[x_axis, y_axis])
-                        if not filtered_df.empty:
+                            elif start_date:
+                                filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
+                            elif end_date:
+                                filtered_df = filtered_df[filtered_df['Date'] <= pd.to_datetime(end_date)]
+                            filtered_df = filtered_df.dropna(subset=[x_axis, y_axis])
+                            if filtered_df.empty:
+                                st.warning("No data available for the selected parameters and filters.")
+                                st.stop()
+                            if len(filtered_df) < 2:
+                                st.warning("Not enough data points (minimum 2 required) to generate scatter plot.")
+                                st.stop()
+                            if not (filtered_df[x_axis].dtype in [np.float64, np.int64] and
+                                    filtered_df[y_axis].dtype in [np.float64, np.int64]):
+                                st.error("Selected parameters must be numeric for scatter plot.")
+                                st.stop()
                             fig_scatter = px.scatter(filtered_df, x=x_axis, y=y_axis, color='Site',
                                                      title=f"{y_axis} vs. {x_axis}", hover_data=['Date'])
+                            if show_best_fit:
+                                try:
+                                    x_data = filtered_df[x_axis].values
+                                    y_data = filtered_df[y_axis].values
+                                    coeffs = np.polyfit(x_data, y_data, 1)
+                                    slope, intercept = coeffs
+                                    x_range = np.array([x_data.min(), x_data.max()])
+                                    y_fit = slope * x_range + intercept
+                                    fig_scatter.add_scatter(
+                                        x=x_range,
+                                        y=y_fit,
+                                        mode='lines',
+                                        name='Best Fit',
+                                        line=dict(color='red', width=2)
+                                    )
+                                except Exception as e:
+                                    st.warning(f"Unable to compute best-fit line: {str(e)}")
                             fig_scatter.update_layout(
                                 height=500,
                                 plot_bgcolor='white',
@@ -428,10 +455,12 @@ with tab3:
                                 font=dict(family='Montserrat' if font_base64 else 'sans-serif')
                             )
                             st.plotly_chart(fig_scatter, use_container_width=True)
-                        else:
-                            st.warning("No data available for the selected parameters and filters.")
+                        except Exception as e:
+                            st.error(f"Error generating scatter plot: {str(e)}")
+                            st.stop()
             else:
                 st.error("Water Quality data not loaded. Cannot display scatter plots.")
+                st.stop()
 
         elif visualization == "Distributions":
             if not bfar_df.empty or not philvolcs_df.empty:
@@ -886,9 +915,38 @@ with tab3:
                             else:
                                 st.error("No Water Quality data loaded. Cannot display site comparison.")
 
+        elif visualization == "Descriptive Analytics":
+            if not bfar_df.empty:
+                st.markdown(
+                    "<div class='custom-text-primary' style='margin-bottom: 8px; margin-top: 0px; "
+                    "font-size: 20px; text-align: justify;'>Descriptive Analytics</div>",
+                    unsafe_allow_html=True)
+                numeric_params = [col for col in bfar_df.select_dtypes(include=np.number).columns
+                                  if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
+                                  and bfar_df[col].notna().any()]
+                if numeric_params:
+                    stats_df = bfar_df[numeric_params].describe().T
+                    stats_df = stats_df[['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']]
+                    stats_df = stats_df.rename(columns={
+                        'count': 'Count',
+                        'mean': 'Mean',
+                        'std': 'Std Dev',
+                        'min': 'Min',
+                        '25%': 'Q1',
+                        '50%': 'Median',
+                        '75%': 'Q3',
+                        'max': 'Max'
+                    })
+                    stats_df = stats_df.round(2)
+                    st.dataframe(stats_df, use_container_width=True)
+                else:
+                    st.warning("No numeric parameters available for descriptive analytics.")
+                st.markdown("</div>", unsafe_allow_html=True)
+            else:
+                st.error("Water Quality data not loaded. Cannot display analytics or overview.")
+
 with tab4:
-    set_active_tab("Prediction")
-    st.info("This section is under development.")
+    pass
 
 with tab_info:
     set_active_tab("About")
