@@ -282,7 +282,7 @@ with tab3:
             )
         visualization = st.session_state.visualization
 
-    elif visualization == "Correlation Matrix":
+    if visualization == "Correlation Matrix":
         if not bfar_df.empty:
             numeric_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
                                     if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
