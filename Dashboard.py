@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-
 # ==== PAGE CONFIG ====
 st.set_page_config(page_title="Water Quality Dashboard", page_icon="📊", layout="wide")
 
@@ -88,8 +87,8 @@ st.markdown(f"""
     {font_style}
     .block-container {{
         max-width: 1200px !important;
-        padding: 3rem 0rem !important;
-        margin:  0 5px 5px 5px !important;
+        padding: 3rem 0rem 3rem 0rem !important;  # Adjusted bottom padding for footer
+        margin: 0 5px 5px 5px !important;
     }}
     .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
     .section-header, .custom-label, .stTabs [data-baseweb="tab"] p,
@@ -97,6 +96,7 @@ st.markdown(f"""
     .custom-text-primary, .custom-text-secondary {{
         font-family: {'Montserrat' if font_base64 else 'sans-serif'} !important;
     }}
+    
     /* Selected parameters in multiselect (background and text color) */
     .stMultiSelect [data-baseweb="select"] .st-ae {{
         background-color: #004A99 !important;
@@ -117,11 +117,10 @@ st.markdown(f"""
     }}
     {tab_style}
     .stTabs [data-baseweb="tab-panel"] {{
-        padding: 0px 5px 5px 5px ;
+        padding: 0px 5px 5px 5px;
         margin: 0 0 0 0;
     }}
-
-    .stTabs [data-baseweb="tab-list"] {{ 10px; gap: 25px; justify-content: right; }}
+    .stTabs [data-baseweb="tab-list"] {{ gap: 25px; justify-content: right; }}
     .stTabs [data-baseweb="tab"] {{ 
         background-color: rgba(128, 150, 173, 0.5);
         border-radius: 8px;
@@ -152,36 +151,45 @@ st.markdown(f"""
         transform: translateY(-3px);
     }}
     .stTabs [aria-selected="true"] p {{ color: #ffffff !important; }}
-    .custom-divider {{ border-top: 1px solid #748DA6; margin-top: 10px; margin-bottom:15px ; }}
+    .custom-divider {{ border-top: 1px solid #748DA6; margin-top: 10px; margin-bottom:15px; }}
     .custom-text-primary {{ color: #222831; font-size: 18px; padding-top: 0px; }}
     .custom-text-secondary {{ color: #393E46; font-size: 16px; }}
+    
+    .full-width-footer {{
+        max-width: 1200px !important;
+        display: block;
+        margin: 0 auto;
+        border-radius: 0 0 8px 8px;
+        width: 100%;
+        position: relative;
+        bottom: 0;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
-
 # ==== TABS ====
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = "Homepage"
+
+def set_active_tab(tab):
+    st.session_state.active_tab = tab
+
 tab1, tab3, tab4, tab_info = st.tabs(["🏠 Homepage", "📈 Visualizations", "🔮 Prediction", "ℹ️ About"])
 
-# ==== TAB 1: Homepage ====
 with tab1:
-    # Add CSS to style the full-width GIF
+    set_active_tab("Homepage")
     st.markdown("""
     <style>
     .full-width-gif {
-        max-width: 1200px !important;
+        max-width: 100% !important;
         display: block;
-        margin: 0 auto; /* Center the GIF */
-        margin-top: 3rem; /* Move GIF upward to offset block-container padding */
-        border-radius: 8px; /* Add rounded corners */
-    }
-    .greeting-message {
-        text-align: center;
-        margin-bottom: 1rem; /* Space between greeting and GIF */
+        margin: 0 auto;
+        margin-top: 1rem;
+        border-radius: 0px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-    # Load and display the GIF
     try:
         with open("images/homepage.gif", "rb") as img_file:
             img_base64 = base64.b64encode(img_file.read()).decode()
@@ -194,12 +202,13 @@ with tab1:
     except Exception as e:
         st.error(f"Error loading homepage.gif: {e}")
 
+    st.markdown("<div class='custom-divider' style='margin-bottom: 7rem;'></div>", unsafe_allow_html=True)
+
 with tab3:
-    # Initialize session state for visualization selection
+    set_active_tab("Visualizations")
     if 'visualization' not in st.session_state:
         st.session_state.visualization = "Correlation Matrix"
 
-    # Update CSS to style buttons
     st.markdown("""
     <style>
     [data-testid="stButton"] button {
@@ -223,19 +232,19 @@ with tab3:
         background-color: rgba(88, 139, 206, 0.5) !important;
         color: #FFFFFF !important;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.0);
-        transform: translateX(5px);
+        transform: translateX(10px);
     }
     [data-testid="stButton"] button[kind="primary"] {
         background-color: #004A99 !important; 
         color: #FFFFFF !important;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
-        transform: translateX(5px);
+        transform: translateX(10px);
     }
     [data-testid="stButton"] button:active {
         background-color: #003366 !important;
         color: #FFFFFF !important;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transform: translateX(5px);
+        transform: translateX(10px);
         transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
     }
     </style>
@@ -247,7 +256,6 @@ with tab3:
             "<div class='custom-text-primary' style='margin-bottom: 10px; margin-top: 0px; "
             "font-size: 15px; text-align: justify;'>Select a Visualization</div>",
             unsafe_allow_html=True)
-        # Visualization buttons
         visualization_options = [
             "Correlation Matrix",
             "Scatter Plots",
@@ -257,7 +265,6 @@ with tab3:
             "Line Chart"
         ]
         for option in visualization_options:
-            # Determine if this button is selected
             is_selected = st.session_state.visualization == option
             st.button(
                 option,
@@ -355,8 +362,7 @@ with tab3:
         elif visualization == "Scatter Plots":
             if not bfar_df.empty:
                 numeric_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
-                                         if
-                                         col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
+                                         if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
                                          and bfar_df[col].notna().any()])
                 if len(numeric_params) < 2:
                     st.warning("At least two numeric parameters are required for scatter plots.")
@@ -417,222 +423,114 @@ with tab3:
             else:
                 st.error("Water Quality data not loaded. Cannot display scatter plots.")
 
-
         elif visualization == "Distributions":
-
             if not bfar_df.empty or not philvolcs_df.empty:
-
                 bfar_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
-
                                       if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition',
-
                                                      'Wind Direction']
-
                                       and bfar_df[col].notna().any()])
-
                 philvolcs_params = sorted([col for col in philvolcs_df.select_dtypes(include=np.number).columns
-
                                            if col not in ['Year', 'Month', 'Day', 'Latitude', 'Longitude']
-
                                            and philvolcs_df[col].notna().any()])
-
                 param_options = ([f"{param} (Water Quality)" for param in bfar_params] +
-
                                  [f"{param} (PHIVOLCS)" for param in philvolcs_params])
-
                 if not param_options:
-
                     st.warning("No numeric parameters available for distribution plots.")
-
                 else:
-
                     col1, col2 = st.columns([5, 2])
-
                     with col2:
-
                         st.markdown(
-
                             "<div class='custom-text-primary' style='margin-bottom: 0px; margin-top: 0px; "
-
                             "font-size: 17px; text-align: justify;'>Distributions Configuration</div>",
-
                             unsafe_allow_html=True)
-
                         selected_param = st.selectbox("Select Parameter for Distribution:", param_options,
-
                                                       index=0, key="dist_param")
-
                         sites = ['All Sites'] + sorted(bfar_df['Site'].astype(str).unique()) if not bfar_df.empty else [
-
                             'All Sites']
-
                         selected_site = st.selectbox("Filter by Site (Optional, Water Quality only):", sites,
-
                                                      key="dist_site_filter")
-
                         min_date = bfar_df['Date'].min() if not bfar_df.empty else philvolcs_df['Date'].min()
-
                         max_date = bfar_df['Date'].max() if not bfar_df.empty else philvolcs_df['Date'].max()
-
                         show_trend_line = st.checkbox("Show Trend Line", value=False, key="dist_trend_line")
-
                         start_date = st.date_input("Start Date (Optional):", value=None, min_value=min_date,
-
                                                    max_value=max_date,
-
                                                    key="dist_start_date")
-
                         end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date,
-
                                                  max_value=max_date,
-
                                                  key="dist_end_date")
-
                     with col1:
-
                         param_name = selected_param.split(" (")[0]
-
                         dataset = selected_param.split(" (")[1].rstrip(")")
-
                         if dataset == "Water Quality" and not bfar_df.empty:
-
                             filtered_df = bfar_df.copy()
-
                             if selected_site != 'All Sites':
                                 filtered_df = filtered_df[filtered_df['Site'] == selected_site]
-
                         elif dataset == "PHIVOLCS" and not philvolcs_df.empty:
-
                             filtered_df = philvolcs_df.copy()
-
                         else:
-
                             filtered_df = pd.DataFrame()
-
                         if not filtered_df.empty:
-
                             if start_date and end_date:
-
                                 start_date = pd.to_datetime(start_date)
-
                                 end_date = pd.to_datetime(end_date)
-
                                 if start_date > end_date:
-
                                     st.error("Error: Start date cannot be after end date.")
-
                                 else:
-
                                     filtered_df = filtered_df[(filtered_df['Date'] >= start_date) &
-
                                                               (filtered_df['Date'] <= end_date)]
-
                             elif start_date:
-
                                 filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
-
                             elif end_date:
-
                                 filtered_df = filtered_df[filtered_df['Date'] <= pd.to_datetime(end_date)]
-
                             data = filtered_df[param_name].dropna()
-
                             title = f"Distribution of {param_name} ({dataset}) in {selected_site}"
-
                             if not data.empty:
-
                                 fig_hist = px.histogram(data, x=param_name, nbins=30, title=title,
-
                                                         color_discrete_sequence=['#004A99'])
-
                                 fig_hist.update_traces(opacity=0.75)
-
                                 if show_trend_line:
-
                                     try:
-
                                         from scipy.stats import gaussian_kde
-
                                         import numpy as np
-
-                                        if len(data) >= 2 and data.nunique() > 1:  # Check for sufficient data and variability
-
+                                        if len(data) >= 2 and data.nunique() > 1:
                                             kde = gaussian_kde(data)
-
                                             x_range = np.linspace(data.min(), data.max(), 100)
-
                                             kde_vals = kde(x_range)
-
-                                            # Scale KDE to match histogram height
-
-                                            hist_height = data.size  # Approximate height per bin
-
+                                            hist_height = data.size
                                             kde_vals_scaled = kde_vals * hist_height * (data.max() - data.min()) / 30
-
                                             fig_hist.add_scatter(
-
                                                 x=x_range,
-
                                                 y=kde_vals_scaled,
-
                                                 mode='lines',
-
                                                 name='KDE Trend',
-
-                                                showlegend=False,  # Hide in legend
-
+                                                showlegend=False,
                                                 line=dict(color='red', width=2)
-
                                             )
-
                                         else:
-
                                             st.warning(
                                                 "Not enough data or variability in the selected range to compute KDE trend line.")
-
                                     except Exception as e:
-
                                         st.warning(
                                             "Not enough data or variability in the selected range to compute KDE trend line.")
-
                                 fig_hist.update_layout(
-
-                                    showlegend=False,  # No legend for histogram or KDE
-
+                                    showlegend=False,
                                     plot_bgcolor='white',
-
                                     paper_bgcolor='white',
-
                                     height=500,
-
                                     xaxis_title=param_name,
-
                                     title_font=dict(
-
                                         size=18,
-
                                         family='Montserrat' if font_base64 else 'sans-serif'
-
                                     ),
-
                                     title_x=0.03,
-
                                     margin=dict(l=00, r=0, t=40, b=0),
-
                                     yaxis_title="Count",
-
                                     font=dict(family='Montserrat' if font_base64 else 'sans-serif')
-
                                 )
-
                                 st.plotly_chart(fig_hist, use_container_width=True)
-
                             else:
-
                                 st.warning(f"No data available for {selected_param} after applying filters.")
-
                         else:
-
                             st.warning(f"No data available for {selected_param}.")
 
         elif visualization == "Histogram":
@@ -719,8 +617,6 @@ with tab3:
                                 st.warning(f"No data available for {selected_param} after applying filters.")
                         else:
                             st.warning(f"No data available for {selected_param}.")
-            else:
-                st.error("No data loaded. Cannot display histogram.")
 
         elif visualization == "Box Plot":
             if not bfar_df.empty or not philvolcs_df.empty:
@@ -786,10 +682,9 @@ with tab3:
                                 fig_box = px.box(data, x=param_name, title=title,
                                                  color_discrete_sequence=['#004A99'])
                                 fig_box.update_traces(marker=dict(size=5, opacity=0.75))
-                                # Calculate tick values for x-axis
                                 min_val = data[param_name].min()
                                 max_val = data[param_name].max()
-                                tick_vals = np.linspace(min_val, max_val, num=10).round(2)  # 10 evenly spaced ticks
+                                tick_vals = np.linspace(min_val, max_val, num=10).round(2)
                                 fig_box.update_xaxes(
                                     tickvals=tick_vals,
                                     ticktext=[f"{val:.2f}" for val in tick_vals],
@@ -846,7 +741,7 @@ with tab3:
                                 'All Sites']
                             selected_site = st.selectbox("Filter by Site (Optional, Water Quality only):", sites,
                                                          key="line_site_filter")
-                        else:  # Compare Sites
+                        else:
                             if not bfar_df.empty:
                                 selected_param = st.selectbox("Select Parameter for Comparison:", param_options,
                                                               index=0, key="line_param")
@@ -869,10 +764,8 @@ with tab3:
                             if not selected_params:
                                 st.warning("Please select at least one parameter for the line chart.")
                             else:
-                                # Extract dataset and parameter names
                                 datasets = [param.split(" (")[1].rstrip(")") for param in selected_params]
                                 param_names = [param.split(" (")[0] for param in selected_params]
-                                # Check if all parameters are from the same dataset
                                 if len(set(datasets)) > 1:
                                     st.error(
                                         "Please select parameters from the same dataset (either Water Quality or PHIVOLCS).")
@@ -929,7 +822,7 @@ with tab3:
                                                 f"No data available for the selected parameters after applying filters.")
                                     else:
                                         st.warning(f"No data available for the selected parameters.")
-                        else:  # Compare Sites
+                        else:
                             if not bfar_df.empty:
                                 if not selected_sites:
                                     st.warning("Please select at least one site for the line chart.")
@@ -981,47 +874,17 @@ with tab3:
                                                 f"No data available for {param_name} at the selected sites after applying filters.")
                             else:
                                 st.error("No Water Quality data loaded. Cannot display site comparison.")
-            else:
-                st.error("No data loaded. Cannot display line chart.")
-    try:
-        with open("images/footer.png", "rb") as img_file:
-            img_base64 = base64.b64encode(img_file.read()).decode()
-        st.markdown(
-            f'<img src="data:image/png;base64,{img_base64}" alt="Footer" '
-            f'style=" border-radius: 0 0 8px 8px; max-width: 1190px; margin: 0 auto;">',
-            unsafe_allow_html=True
-        )
-    except FileNotFoundError:
-        st.warning("footer.png not found in the images folder. Please ensure the file exists in the repository.")
-    except Exception as e:
-        st.error(f"Error loading footer.png: {e}")
-    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
 
-# ==== TAB 4: Prediction ====
 with tab4:
+    set_active_tab("Prediction")
     st.info("This section is under development.")
 
-    try:
-        with open("images/footer.png", "rb") as img_file:
-            img_base64 = base64.b64encode(img_file.read()).decode()
-        st.markdown(
-            f'<img src="data:image/png;base64,{img_base64}" alt="Footer" '
-            f'style=" border-radius: 0 0 8px 8px; max-width: 1190px; margin: 0 auto;">',
-            unsafe_allow_html=True
-        )
-    except FileNotFoundError:
-        st.warning("footer.png not found in the images folder. Please ensure the file exists in the repository.")
-    except Exception as e:
-        st.error(f"Error loading footer.png: {e}")
-    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
-
-# ==== TAB INFO: About ====
 with tab_info:
+    set_active_tab("About")
     st.markdown(
         "<div class='custom-text-primary' style='font-size: 22px; text-align: justify;'>Dataset Information</div>",
         unsafe_allow_html=True)
 
-    # Load uncleaned datasets for overview
     bfar_raw_df = pd.DataFrame()
     philvolcs_raw_df = pd.DataFrame()
     try:
@@ -1089,7 +952,7 @@ with tab_info:
             except Exception as e:
                 st.error(f"Error loading PHIVOLCS.png: {e}")
         with colC_ph:
-            st.markdown("""
+            st.markdown(""" 
                 <div class='custom-text-primary' style='margin-top: 18px; font-size: 30px; text-align: left; color: #222831;'>PHIVOLCS Dataset</div>
                 <div class='custom-text-secondary' style='margin-bottom: 27px;color: #43B5C3; font-size: 18px; text-align: left;'>(Volcanic Activity)</div>
             """, unsafe_allow_html=True)
@@ -1133,7 +996,7 @@ with tab_info:
 
     st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(""" 
         <div class='custom-text-primary' style='font-size: 23px; text-align: justify;'>About the Developers</div>
         <div class='custom-text-primary' style='font-size: 15px; text-align: justify; margin-bottom:25px; '>Group 2 - BS CPE 3-1</div>
     """, unsafe_allow_html=True)
@@ -1168,17 +1031,17 @@ with tab_info:
                 st.error(f"Error loading {dev['img']}: {e}")
             st.markdown(f"**{dev['name']}**<br>Phone: {dev['phone']}<br>Email: {dev['email']}", unsafe_allow_html=True)
 
-    try:
-        with open("images/footer.png", "rb") as img_file:
-            img_base64 = base64.b64encode(img_file.read()).decode()
-        st.markdown(
-            f'<img src="data:image/png;base64,{img_base64}" alt="Footer" '
-            f'style=" border-radius: 0 0 8px 8px; max-width: 1190px; margin: 0 auto;">',
-            unsafe_allow_html=True
-        )
-    except FileNotFoundError:
-        st.warning("footer.png not found in the images folder. Please ensure the file exists in the repository.")
-    except Exception as e:
-        st.error(f"Error loading footer.png: {e}")
-    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
-
+# ==== FOOTER ====
+footer_img = "images/footer.png"
+try:
+    with open(footer_img, "rb") as img_file:
+        img_base64 = base64.b64encode(img_file.read()).decode()
+    st.markdown(
+        f'<img src="data:image/png;base64,{img_base64}" alt="Footer" class="full-width-footer">',
+        unsafe_allow_html=True
+    )
+except FileNotFoundError:
+    st.warning(f"{footer_img} not found in the images folder. Please ensure the file exists in the repository.")
+except Exception as e:
+    st.error(f"Error loading {footer_img}: {e}")
+st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
