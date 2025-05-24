@@ -112,7 +112,7 @@ st.markdown(f"""
     }}
     /* Outline of dropdown menus (selectbox and multiselect) */
     [data-baseweb="select"] > div {{
-        border: 1px solid #004A99 !important;
+        border: 0px solid #004A99 !important;
         border-radius: 8px !important;
     }}
     {tab_style}
@@ -120,15 +120,16 @@ st.markdown(f"""
         padding: 0px 5px 5px 5px;
         margin: 0 0 0 0;
     }}
-    .stTabs [data-baseweb="tab-list"] {{ gap: 25px; justify-content: right; }}
+    .stTabs [data-baseweb="tab-list"] {{ gap: 25px; justify-content: right; padding-right: 3rem; }}
+    
     .stTabs [data-baseweb="tab"] {{ 
         background-color: rgba(128, 150, 173, 0.5);
         border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
         border: none !important;
         padding: 20px;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(2px);
     }}
     .stTabs [data-baseweb="tab"] p {{ 
         color: #002244;
@@ -147,7 +148,7 @@ st.markdown(f"""
     .stTabs [aria-selected="true"] {{ 
         background-color: rgba(0, 74, 173, 0.95) !important;
         color: #ffffff !important;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         transform: translateY(-3px);
     }}
     .stTabs [aria-selected="true"] p {{ color: #ffffff !important; }}
@@ -204,6 +205,9 @@ with tab1:
 
     st.markdown("<div class='custom-divider' style='margin-bottom: 7rem;'></div>", unsafe_allow_html=True)
 
+# Only the modified parts of the Visualizations tab (tab3) are included.
+# Replace the corresponding sections in the original Dashboard.py.
+
 with tab3:
     set_active_tab("Visualizations")
     if 'visualization' not in st.session_state:
@@ -232,20 +236,26 @@ with tab3:
         background-color: rgba(88, 139, 206, 0.5) !important;
         color: #FFFFFF !important;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.0);
-        transform: translateX(10px);
+        transform: translateX(5px);
     }
     [data-testid="stButton"] button[kind="primary"] {
         background-color: #004A99 !important; 
         color: #FFFFFF !important;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
-        transform: translateX(10px);
+        transform: translateX(5px);
     }
     [data-testid="stButton"] button:active {
         background-color: #003366 !important;
         color: #FFFFFF !important;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transform: translateX(10px);
+        transform: translateX(5px);
         transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+    }
+    div.js-plotly-plot {
+        border: 2px solid #004A99 !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        box-shadow: 0 0px 5px rgba(0, 0, 0, 0.4);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -346,7 +356,7 @@ with tab3:
                                             family='Montserrat' if font_base64 else 'sans-serif'
                                         ),
                                         title_x=0.03,
-                                        margin=dict(l=00, r=0, t=40, b=0),
+                                        margin=dict(l=20, r=20, t=60, b=20),
                                         font=dict(family='Montserrat' if font_base64 else 'sans-serif')
                                     )
                                     fig_heatmap.update_xaxes(tickangle=45)
@@ -414,7 +424,7 @@ with tab3:
                                     family='Montserrat' if font_base64 else 'sans-serif'
                                 ),
                                 title_x=0.03,
-                                margin=dict(l=00, r=0, t=40, b=0),
+                                margin=dict(l=20, r=20, t=60, b=20),
                                 font=dict(family='Montserrat' if font_base64 else 'sans-serif')
                             )
                             st.plotly_chart(fig_scatter, use_container_width=True)
@@ -523,7 +533,7 @@ with tab3:
                                         family='Montserrat' if font_base64 else 'sans-serif'
                                     ),
                                     title_x=0.03,
-                                    margin=dict(l=00, r=0, t=40, b=0),
+                                    margin=dict(l=20, r=20, t=60, b=20),
                                     yaxis_title="Count",
                                     font=dict(family='Montserrat' if font_base64 else 'sans-serif')
                                 )
@@ -607,7 +617,7 @@ with tab3:
                                         family='Montserrat' if font_base64 else 'sans-serif'
                                     ),
                                     title_x=0.03,
-                                    margin=dict(l=00, r=0, t=40, b=0),
+                                    margin=dict(l=20, r=20, t=60, b=20),
                                     xaxis_title=param_name,
                                     yaxis_title="Count",
                                     font=dict(family='Montserrat' if font_base64 else 'sans-serif')
@@ -696,12 +706,13 @@ with tab3:
                                     showlegend=False,
                                     plot_bgcolor='white',
                                     paper_bgcolor='white',
+                                    height=500,
                                     title_font=dict(
                                         size=18,
                                         family='Montserrat' if font_base64 else 'sans-serif'
                                     ),
                                     title_x=0.03,
-                                    margin=dict(l=00, r=0, t=40, b=0),
+                                    margin=dict(l=20, r=20, t=60, b=20),
                                     xaxis_title=param_name,
                                     yaxis_title="",
                                     font=dict(family='Montserrat' if font_base64 else 'sans-serif')
@@ -811,7 +822,7 @@ with tab3:
                                                     family='Montserrat' if font_base64 else 'sans-serif'
                                                 ),
                                                 title_x=0.03,
-                                                margin=dict(l=00, r=0, t=40, b=0),
+                                                margin=dict(l=20, r=20, t=60, b=20),
                                                 xaxis_title="Date",
                                                 yaxis_title="Value",
                                                 font=dict(family='Montserrat' if font_base64 else 'sans-serif')
@@ -863,7 +874,7 @@ with tab3:
                                                     family='Montserrat' if font_base64 else 'sans-serif'
                                                 ),
                                                 title_x=0.03,
-                                                margin=dict(l=00, r=0, t=40, b=0),
+                                                margin=dict(l=20, r=20, t=60, b=20),
                                                 xaxis_title="Date",
                                                 yaxis_title=param_name,
                                                 font=dict(family='Montserrat' if font_base64 else 'sans-serif')
