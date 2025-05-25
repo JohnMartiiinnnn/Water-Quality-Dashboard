@@ -3,6 +3,7 @@ import base64
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import uuid
 
 # ==== PAGE CONFIG ====
 st.set_page_config(page_title="Water Quality Dashboard", page_icon="📊", layout="wide")
@@ -22,6 +23,7 @@ try:
         banner_img_base64 = base64.b64encode(img_file.read()).decode()
 except FileNotFoundError:
     st.warning("header.png not found. Using solid background for tabs.")
+
 
 # ==== LOAD DATA ====
 @st.cache_data
@@ -44,6 +46,7 @@ def load_data():
 
     return bfar_df, philvolcs_df
 
+
 bfar_df, philvolcs_df = load_data()
 
 # ==== LOAD TAAL INFO ====
@@ -53,6 +56,18 @@ try:
         taal_info = f.read()
 except FileNotFoundError:
     st.warning("taalinfo.txt not found.")
+
+hide_streamlit_style = """
+            <style>
+                /* Hide the Streamlit header and menu */
+                header {visibility: hidden;}
+                /* Optionally, hide the footer */
+                .streamlit-footer {display: none;}
+                /* Hide your specific div class, replace class name with the one you identified */
+            </style>
+            """
+
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # ==== CSS STYLING ====
 font_style = f"""
@@ -87,8 +102,8 @@ st.markdown(f"""
     {font_style}
     .block-container {{
         max-width: 98% !important;
-        padding: 3rem 0rem 3rem 0rem !important;  # Adjusted bottom padding for footer
-        margin: 0 5px 5px 5px !important;
+        padding: 0rem 0rem 0rem 0rem !important;  # Adjusted bottom padding for footer
+        margin-top: 0px 0px 5px 5px !important;
     }}
     .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
     .section-header, .custom-label, .stTabs [data-baseweb="tab"] p,
@@ -96,7 +111,7 @@ st.markdown(f"""
     .custom-text-primary, .custom-text-secondary {{
         font-family: {'Montserrat' if font_base64 else 'sans-serif'} !important;
     }}
-    
+
     /* Selected parameters in multiselect (background and text color) */
     .stMultiSelect [data-baseweb="select"] .st-ae {{
         background-color: #004A99 !important;
@@ -121,7 +136,7 @@ st.markdown(f"""
         margin: 0 0 0 0;
     }}
     .stTabs [data-baseweb="tab-list"] {{ gap: 25px; justify-content: right; padding-right: 3rem; }}
-    
+
     .stTabs [data-baseweb="tab"] {{ 
         background-color: rgba(128, 150, 173, 0.5);
         border-radius: 8px;
@@ -148,14 +163,14 @@ st.markdown(f"""
     .stTabs [aria-selected="true"] {{ 
         background-color: rgba(0, 74, 173, 0.95) !important;
         color: #ffffff !important;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
         transform: translateY(-3px);
     }}
     .stTabs [aria-selected="true"] p {{ color: #ffffff !important; }}
     .custom-divider {{ border-top: 1px solid #748DA6; margin-top: 10px; margin-bottom:15px; }}
     .custom-text-primary {{ color: #222831; font-size: 18px; padding-top: 0px; }}
     .custom-text-secondary {{ color: #393E46; font-size: 16px; }}
-    
+
     .full-width-footer {{
         max-width: 100% !important;
         display: block;
@@ -172,11 +187,14 @@ st.markdown(f"""
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "Homepage"
 
+
 def set_active_tab(tab):
     st.session_state.active_tab = tab
 
+
 tab1, tab3, tab4, tab_info = st.tabs(["🏠 Homepage", "📈 Visualizations", "🔮 Prediction", "ℹ️ About"])
 
+# ==== Homepage  ====
 with tab1:
     set_active_tab("Homepage")
     st.markdown("""
@@ -205,6 +223,7 @@ with tab1:
 
     st.markdown("<div class='custom-divider' style='margin-bottom: 7rem;'></div>", unsafe_allow_html=True)
 
+# ==== Visualization ====
 with tab3:
     set_active_tab("Visualizations")
     if 'visualization' not in st.session_state:
@@ -533,6 +552,7 @@ with tab3:
                                     try:
                                         from scipy.stats import gaussian_kde
                                         import numpy as np
+
                                         if len(data) >= 2 and data.nunique() > 1:
                                             kde = gaussian_kde(data)
                                             x_range = np.linspace(data.min(), data.max(), 100)
@@ -757,7 +777,8 @@ with tab3:
         elif visualization == "Line Chart":
             if not bfar_df.empty or not philvolcs_df.empty:
                 bfar_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
-                                      if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
+                                      if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition',
+                                                     'Wind Direction']
                                       and bfar_df[col].notna().any()])
                 philvolcs_params = sorted([col for col in philvolcs_df.select_dtypes(include=np.number).columns
                                            if col not in ['Year', 'Month', 'Day', 'Latitude', 'Longitude']
@@ -773,13 +794,15 @@ with tab3:
                             "<div class='custom-text-primary' style='margin-bottom: 0px; margin-top: 0px; "
                             "font-size: 17px; text-align: justify;'>Line Chart Configuration</div>",
                             unsafe_allow_html=True)
-                        compare_mode = st.radio("Compare By:", ["Parameters", "Sites"], index=0, key="line_compare_mode", horizontal=True)
+                        compare_mode = st.radio("Compare By:", ["Parameters", "Sites"], index=0,
+                                                key="line_compare_mode", horizontal=True)
                         if compare_mode == "Parameters":
                             selected_params = st.multiselect("Select Parameters for Comparison (at least 1):",
                                                              param_options,
                                                              default=[param_options[0]] if param_options else [],
                                                              key="line_params")
-                            sites = ['All Sites'] + sorted(bfar_df['Site'].astype(str).unique()) if not bfar_df.empty else [
+                            sites = ['All Sites'] + sorted(
+                                bfar_df['Site'].astype(str).unique()) if not bfar_df.empty else [
                                 'All Sites']
                             selected_site = st.selectbox("Filter by Site (Optional, Water Quality only):", sites,
                                                          key="line_site_filter")
@@ -799,7 +822,8 @@ with tab3:
                         start_date = st.date_input("Start Date (Optional):", value=None, min_value=min_date,
                                                    max_value=max_date,
                                                    key="line_start_date")
-                        end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date, max_value=max_date,
+                        end_date = st.date_input("End Date (Optional):", value=None, min_value=min_date,
+                                                 max_value=max_date,
                                                  key="line_end_date")
                     with col1:
                         if compare_mode == "Parameters":
@@ -947,13 +971,434 @@ with tab3:
             else:
                 st.error("Water Quality data not loaded. Cannot display analytics or overview.")
 
+# ==== Prediction ====
 with tab4:
-    pass
+    set_active_tab("Prediction")
+    st.markdown("""
+    <style>
+    [data-testid="stButton"] button {
+        transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        background-color: rgba(128, 150, 173, 0.15) !important;
+        border-radius: 8px !important;
+        padding: 0px 13px !important;
+        width: 180px !important; 
+        text-align: center !important;
+        color: #002244 !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        font-family: Montserrat, sans-serif !important;
+        border: none !important;
+        margin-bottom: 0px !important;
+        cursor: pointer !important;
+        display: block !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.);
+    }
+    [data-testid="stButton"] button:hover {
+        background-color: rgba(88, 139, 206, 0.5) !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.0);
+        transform: translateX(5px);
+    }
+    [data-testid="stButton"] button[kind="primary"] {
+        background-color: #004A99 !important; 
+        color: #FFFFFF !important;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0);
+        transform: translateX(5px);
+    }
+    [data-testid="stButton"] button:active {
+        background-color: #003366 !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transform: translateX(5px);
+        transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+    }
+    div.js-plotly-plot {
+        border: 2px solid #004A99 !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        box-shadow: 0 0px 5px rgba(0, 0, 0, 0.4);
+    }
+    .custom-text-small {
+        color: #808080 !important;
+        font-size: 12px !important;
+        text-align: justify !important;
+        font-family: Montserrat, sans-serif !important;
+        margin-bottom: 2px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
+    colA, colB = st.columns([2, 4])
+
+    with colA:
+        col1, col2 = st.columns([9,9])
+        with col1:
+            st.markdown(
+                "<div class='custom-text-primary' style='margin-bottom: 10px; margin-top: 0px; "
+                "font-size: 15px; text-align: justify;'>Prediction Configuration</div>",
+                unsafe_allow_html=True)
+            prediction_mode = st.radio(
+                "Choose a mode for prediction:",
+                ["Individual Parameter", "Time Series Forecasting"],
+                key="prediction_mode",
+                horizontal=True
+            )
+            selected_model = st.selectbox(
+                "Select Model for Prediction:",
+                ["CNN", "LSTM", "Hybrid CNN-LSTM"],
+                key="pred_model"
+            )
+
+            if 'prediction_results' not in st.session_state:
+                st.session_state.prediction_results = None
+                st.session_state.prediction_params = {}
+
+            bfar_params = sorted([col for col in bfar_df.select_dtypes(include=np.number).columns
+                                  if col not in ['Date', 'Site', 'Year', 'Month', 'Weather Condition', 'Wind Direction']
+                                  and bfar_df[col].notna().any()]) if not bfar_df.empty else []
+            sites = ['All Sites'] + sorted(bfar_df['Site'].astype(str).unique()) if not bfar_df.empty else ['All Sites']
+
+            if prediction_mode == "Individual Parameter":
+                selected_param = st.selectbox("Select Parameter to Predict:", bfar_params, key="pred_param")
+                selected_site = st.selectbox("Select Site:", sites, key="pred_site")
+                prediction_horizon = st.selectbox("Prediction Horizon:", ["1 Week", "2 Weeks", "1 Month", "3 Months"],
+                                                  key="pred_horizon")
+                if st.button("Predict", key="predict_individual", type="primary"):
+                    # Placeholder for model prediction
+                    st.session_state.prediction_params = {
+                        "mode": "Individual Parameter",
+                        "model": selected_model,
+                        "parameter": selected_param,
+                        "site": selected_site,
+                        "horizon": prediction_horizon
+                    }
+                    # Simulate prediction results (placeholder)
+                    dates = pd.date_range(start=pd.Timestamp.today(), periods=7 if prediction_horizon == "1 Week" else
+                    14 if prediction_horizon == "2 Weeks" else
+                    30 if prediction_horizon == "1 Month" else 90, freq='D')
+                    st.session_state.prediction_results = {
+                        "model": selected_model,
+                        "parameter": selected_param,
+                        "site": selected_site,
+                        "horizon": prediction_horizon,
+                        "dates": dates,
+                        "values": np.random.rand(len(dates)),  # Placeholder predictions
+                        "rmse": 0.15, "mae": 0.10, "r2": 0.85,  # Placeholder metrics
+                        "epochs": 50
+                    }
+                    st.session_state.view = "Results"
+            else:
+                selected_site = st.selectbox("Select Site:", sites, key="pred_site_ts")
+                prediction_horizon = st.selectbox("Prediction Horizon:", ["1 Week", "2 Weeks", "1 Month", "3 Months"],
+                                                  key="pred_horizon_ts")
+                if st.button("Predict", key="predict_timeseries", type="primary"):
+                    # Placeholder for model prediction
+                    st.session_state.prediction_params = {
+                        "mode": "Time Series Forecasting",
+                        "model": selected_model,
+                        "site": selected_site,
+                        "horizon": prediction_horizon
+                    }
+                    # Simulate prediction results (placeholder)
+                    dates = pd.date_range(start=pd.Timestamp.today(), periods=7 if prediction_horizon == "1 Week" else
+                    14 if prediction_horizon == "2 Weeks" else
+                    30 if prediction_horizon == "1 Month" else 90, freq='D')
+                    st.session_state.prediction_results = {
+                        "model": selected_model,
+                        "site": selected_site,
+                        "horizon": prediction_horizon,
+                        "dates": dates,
+                        "values": {param: np.random.rand(len(dates)) for param in bfar_params},
+                        # Placeholder predictions
+                        "wqi": np.random.rand(len(dates)),  # Placeholder WQI
+                        "rmse": {param: 0.15 for param in bfar_params},  # Placeholder metrics
+                        "mae": {param: 0.10 for param in bfar_params},
+                        "r2": {param: 0.85 for param in bfar_params},
+                        "epochs": 50
+                    }
+                    st.session_state.view = "Results"
+
+        with col2:
+            st.markdown(
+                "<div class='custom-text-primary' style='margin-bottom: 10px; margin-top: 0px; "
+                "font-size: 15px; text-align: justify;'>Prediction Summary</div>",
+                unsafe_allow_html=True)
+            results = st.session_state.prediction_results
+            st.markdown(
+                "<div class='custom-text-small'>Model Used:</div>"
+                f"<div class='custom-text-primary' style='font-size: 18px; text-align: justify; margin-bottom: 8px;'>"
+                f"{results['model']}</div>",
+                unsafe_allow_html=True
+            )
+            if st.session_state.prediction_params["mode"] == "Individual Parameter":
+                st.markdown(
+                    "<div class='custom-text-small'>Target Parameter:</div>"
+                    f"<div class='custom-text-primary' style='font-size: 18px; text-align: justify; margin-bottom: 8px;'>"
+                    f"{results['parameter']}</div>",
+                    unsafe_allow_html=True
+                )
+                st.markdown(
+                    "<div class='custom-text-small'>Site:</div>"
+                    f"<div class='custom-text-primary' style='font-size: 18px; text-align: justify; margin-bottom: 8px;'>"
+                    f"{results['site']}</div>",
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    "<div class='custom-text-small'>Site:</div>"
+                    f"<div class='custom-text-primary' style='font-size: 18px; text-align: justify; margin-bottom: 8px;'>"
+                    f"{results['site']}</div>",
+                    unsafe_allow_html=True
+                )
+
+            st.markdown(
+                "<div class='custom-text-small'>Time Frame:</div>"
+                f"<div class='custom-text-primary' style='font-size: 18px; text-align: justify; margin-bottom: 8px;'>"
+                f"{results['horizon']}</div>",
+                unsafe_allow_html=True
+            )
+
+            view_options = ["Results", "Evaluation", "Comparison"]
+            if 'view' not in st.session_state:
+                st.session_state.view = "Results"
+            for option in view_options:
+                is_selected = st.session_state.view == option
+                st.button(
+                    option,
+                    key=f"view_button_{option.lower().replace(' ', '_')}",
+                    on_click=lambda opt=option: st.session_state.update(view=opt),
+                    type="primary" if is_selected else "secondary"
+                )
+
+    with colB:
+        if st.session_state.prediction_results is None:
+            st.info("Please configure and run a prediction to view results.")
+        else:
+                if st.session_state.view == "Results":
+                    if st.session_state.prediction_params["mode"] == "Individual Parameter":
+                        # Line Plot for Individual Parameter
+                        df_pred = pd.DataFrame({
+                            "Date": results["dates"],
+                            results["parameter"]: results["values"]
+                        })
+                        fig_pred = px.line(df_pred, x="Date", y=results["parameter"],
+                                           title=f"Predicted {results['parameter']} ({results['site']})")
+                        fig_pred.update_traces(line=dict(width=2, color='#004A99'))
+                        fig_pred.update_layout(
+                            showlegend=True,
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            height=500,
+                            title_font=dict(size=18, family='Montserrat' if font_base64 else 'sans-serif'),
+                            title_x=0.03,
+                            margin=dict(l=20, r=20, t=60, b=20),
+                            xaxis_title="Date",
+                            yaxis_title=results["parameter"],
+                            font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                        )
+                        st.plotly_chart(fig_pred, use_container_width=True)
+
+                        # Tabular Results
+                        st.dataframe(df_pred, use_container_width=True)
+                    else:
+                        # Time Series Forecasting
+                        selected_params = st.multiselect(
+                            "Select Parameters to Plot:",
+                            options=bfar_params,
+                            default=bfar_params[:min(len(bfar_params), 3)],
+                            key="pred_params_plot"
+                        )
+                        if selected_params:
+                            df_pred = pd.DataFrame({"Date": results["dates"]})
+                            for param in selected_params:
+                                df_pred[param] = results["values"][param]
+                            melted_data = df_pred.melt(id_vars=["Date"], value_vars=selected_params,
+                                                       var_name="Parameter", value_name="Value")
+                            fig_pred = px.line(melted_data, x="Date", y="Value", color="Parameter",
+                                               title=f"Predicted Parameters ({results['site']})")
+                            fig_pred.update_traces(line=dict(width=2))
+                            fig_pred.update_layout(
+                                showlegend=True,
+                                plot_bgcolor='white',
+                                paper_bgcolor='white',
+                                height=500,
+                                title_font=dict(size=18, family='Montserrat' if font_base64 else 'sans-serif'),
+                                title_x=0.03,
+                                margin=dict(l=20, r=20, t=60, b=20),
+                                xaxis_title="Date",
+                                yaxis_title="Value",
+                                font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                            )
+                            st.plotly_chart(fig_pred, use_container_width=True)
+
+                        # WQI Line Plot
+                        df_wqi = pd.DataFrame({
+                            "Date": results["dates"],
+                            "Water Quality Index": results["wqi"]
+                        })
+                        fig_wqi = px.line(df_wqi, x="Date", y="Water Quality Index",
+                                          title=f"Predicted Water Quality Index ({results['site']})")
+                        fig_wqi.update_traces(line=dict(width=2, color='#004A99'))
+                        fig_wqi.update_layout(
+                            showlegend=True,
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            height=500,
+                            title_font=dict(size=18, family='Montserrat' if font_base64 else 'sans-serif'),
+                            title_x=0.03,
+                            margin=dict(l=20, r=20, t=60, b=20),
+                            xaxis_title="Date",
+                            yaxis_title="Water Quality Index",
+                            font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                        )
+                        st.plotly_chart(fig_wqi, use_container_width=True)
+
+                        # Tabular Results including WQI
+                        df_pred["Water Quality Index"] = results["wqi"]
+                        st.dataframe(df_pred, use_container_width=True)
+
+                elif st.session_state.view == "Evaluation":
+                    st.markdown(
+                        "<div class='custom-text-primary' style='margin-bottom: 8px; margin-top: 0px; "
+                        "font-size: 20px; text-align: justify;'>Model Evaluation</div>",
+                        unsafe_allow_html=True)
+                    st.markdown(f"**Epochs Trained:** {results['epochs']}")
+
+                    if st.session_state.prediction_params["mode"] == "Individual Parameter":
+                        eval_df = pd.DataFrame({
+                            "Metric": ["RMSE", "MAE", "R²"],
+                            "Value": [results["rmse"], results["mae"], results["r2"]]
+                        })
+                        fig_eval = px.bar(eval_df, x="Metric", y="Value",
+                                          title=f"Evaluation Metrics for {results['parameter']} ({results['site']})",
+                                          color_discrete_sequence=['#004A99'])
+                        fig_eval.update_layout(
+                            showlegend=False,
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            height=500,
+                            title_font=dict(size=18, family='Montserrat' if font_base64 else 'sans-serif'),
+                            title_x=0.03,
+                            margin=dict(l=20, r=20, t=60, b=20),
+                            xaxis_title="Metric",
+                            yaxis_title="Value",
+                            font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                        )
+                        st.plotly_chart(fig_eval, use_container_width=True)
+                    else:
+                        # For Time Series, show evaluation for selected parameters
+                        selected_eval_params = st.multiselect(
+                            "Select Parameters for Evaluation:",
+                            options=bfar_params,
+                            default=bfar_params[:min(len(bfar_params), 3)],
+                            key="eval_params"
+                        )
+                        if selected_eval_params:
+                            eval_data = []
+                            for param in selected_eval_params:
+                                eval_data.append({
+                                    "Parameter": param,
+                                    "RMSE": results["rmse"][param],
+                                    "MAE": results["mae"][param],
+                                    "R²": results["r2"][param]
+                                })
+                            eval_df = pd.DataFrame(eval_data)
+                            melted_eval = eval_df.melt(id_vars="Parameter", value_vars=["RMSE", "MAE", "R²"],
+                                                       var_name="Metric", value_name="Value")
+                            fig_eval = px.bar(melted_eval, x="Metric", y="Value", color="Parameter",
+                                              title=f"Evaluation Metrics ({results['site']})",
+                                              barmode="group")
+                            fig_eval.update_layout(
+                                showlegend=True,
+                                plot_bgcolor='white',
+                                paper_bgcolor='white',
+                                height=500,
+                                title_font=dict(size=18, family='Montserrat' if font_base64 else 'sans-serif'),
+                                title_x=0.03,
+                                margin=dict(l=20, r=20, t=60, b=20),
+                                xaxis_title="Metric",
+                                yaxis_title="Value",
+                                font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                            )
+                            st.plotly_chart(fig_eval, use_container_width=True)
+
+                elif st.session_state.view == "Comparison":
+                    st.markdown(
+                        "<div class='custom-text-primary' style='margin-bottom: 8px; margin-top: 0px; "
+                        "font-size: 20px; text-align: justify;'>Model Comparison</div>",
+                        unsafe_allow_html=True)
+                    # Placeholder for comparison of CNN, LSTM, Hybrid CNN-LSTM
+                    models = ["CNN", "LSTM", "Hybrid CNN-LSTM"]
+                    if st.session_state.prediction_params["mode"] == "Individual Parameter":
+                        comp_data = []
+                        for model in models:
+                            comp_data.append({
+                                "Model": model,
+                                "RMSE": np.random.rand(),  # Placeholder
+                                "MAE": np.random.rand(),
+                                "R²": np.random.rand()
+                            })
+                        comp_df = pd.DataFrame(comp_data)
+                        melted_comp = comp_df.melt(id_vars="Model", value_vars=["RMSE", "MAE", "R²"],
+                                                   var_name="Metric", value_name="Value")
+                        fig_comp = px.bar(melted_comp, x="Metric", y="Value", color="Model",
+                                          title=f"Model Comparison for {results['parameter']} ({results['site']})",
+                                          barmode="group")
+                        fig_comp.update_layout(
+                            showlegend=True,
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            height=500,
+                            title_font=dict(size=18, family='Montserrat' if font_base64 else 'sans-serif'),
+                            title_x=0.03,
+                            margin=dict(l=20, r=20, t=60, b=20),
+                            xaxis_title="Metric",
+                            yaxis_title="Value",
+                            font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                        )
+                        st.plotly_chart(fig_comp, use_container_width=True)
+                    else:
+                        selected_comp_params = st.multiselect(
+                            "Select Parameters for Comparison:",
+                            options=bfar_params,
+                            default=bfar_params[:min(len(bfar_params), 3)],
+                            key="comp_params"
+                        )
+                        if selected_comp_params:
+                            comp_data = []
+                            for model in models:
+                                for param in selected_comp_params:
+                                    comp_data.append({
+                                        "Model": model,
+                                        "Parameter": param,
+                                        "RMSE": np.random.rand(),  # Placeholder
+                                        "MAE": np.random.rand(),
+                                        "R²": np.random.rand()
+                                    })
+                            comp_df = pd.DataFrame(comp_data)
+                            melted_comp = comp_df.melt(id_vars=["Model", "Parameter"], value_vars=["RMSE", "MAE", "R²"],
+                                                       var_name="Metric", value_name="Value")
+                            fig_comp = px.bar(melted_comp, x="Metric", y="Value", color="Model",
+                                              facet_col="Parameter", title=f"Model Comparison ({results['site']})")
+                            fig_comp.update_layout(
+                                showlegend=True,
+                                plot_bgcolor='white',
+                                paper_bgcolor='white',
+                                height=500,
+                                title_font=dict(size=18, family='Montserrat' if font_base64 else 'sans-serif'),
+                                title_x=0.03,
+                                margin=dict(l=20, r=20, t=60, b=20),
+                                xaxis_title="Metric",
+                                yaxis_title="Value",
+                                font=dict(family='Montserrat' if font_base64 else 'sans-serif')
+                            )
+                            st.plotly_chart(fig_comp, use_container_width=True)
+
+# ==== About ====
 with tab_info:
     set_active_tab("About")
     st.markdown(
-        "<div class='custom-text-primary' style='font-size: 22px; text-align: justify;'>Dataset Information</div>",
+        "<div class='custom-text-primary' style='font-size: 22px; text-align: justify;'>About the Dataset</div>",
         unsafe_allow_html=True)
 
     bfar_raw_df = pd.DataFrame()
@@ -1019,7 +1464,8 @@ with tab_info:
                     unsafe_allow_html=True
                 )
             except FileNotFoundError:
-                st.warning("PHIVOLCS.png not found in the images folder. Please ensure the file exists in the repository.")
+                st.warning(
+                    "PHIVOLCS.png not found in the images folder. Please ensure the file exists in the repository.")
             except Exception as e:
                 st.error(f"Error loading PHIVOLCS.png: {e}")
         with colC_ph:
@@ -1045,8 +1491,9 @@ with tab_info:
 
     st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='custom-text-primary' style='margin-bottom:15px; font-size: 23px; text-align: justify;'>About Taal Lake</div>",
-                unsafe_allow_html=True)
+    st.markdown(
+        "<div class='custom-text-primary' style='margin-bottom:15px; font-size: 23px; text-align: justify;'>About Taal Lake</div>",
+        unsafe_allow_html=True)
     col_taal1, col_taal2, col_taal3 = st.columns([5, 0.5, 10])
     with col_taal1:
         try:
@@ -1058,7 +1505,8 @@ with tab_info:
             )
             st.caption("Image from: ShelterBox USA")
         except FileNotFoundError:
-            st.warning("Taal-volcano-map.jpg not found in the images folder. Please ensure the file exists in the repository.")
+            st.warning(
+                "Taal-volcano-map.jpg not found in the images folder. Please ensure the file exists in the repository.")
         except Exception as e:
             st.error(f"Error loading Taal-volcano-map.jpg: {e}")
     with col_taal3:
@@ -1097,7 +1545,8 @@ with tab_info:
                     unsafe_allow_html=True
                 )
             except FileNotFoundError:
-                st.warning(f"{dev['img']} not found in the 1x1 folder. Please ensure the file exists in the repository.")
+                st.warning(
+                    f"{dev['img']} not found in the 1x1 folder. Please ensure the file exists in the repository.")
             except Exception as e:
                 st.error(f"Error loading {dev['img']}: {e}")
             st.markdown(f"**{dev['name']}**<br>Phone: {dev['phone']}<br>Email: {dev['email']}", unsafe_allow_html=True)
