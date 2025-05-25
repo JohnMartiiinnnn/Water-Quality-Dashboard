@@ -1175,6 +1175,10 @@ with tab4:
             st.info("Please configure and run a prediction to view results.")
         else:
                 if st.session_state.view == "Results":
+                    st.markdown(
+                        "<div class='custom-text-primary' style='margin-bottom: 8px; margin-top: 0px; "
+                        "font-size: 20px; text-align: justify;'>Prediction Results</div>",
+                        unsafe_allow_html=True)
                     if st.session_state.prediction_params["mode"] == "Individual Parameter":
                         # Line Plot for Individual Parameter
                         df_pred = pd.DataFrame({
